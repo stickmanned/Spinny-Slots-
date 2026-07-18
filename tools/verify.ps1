@@ -1,0 +1,89 @@
+[CmdletBinding()]
+param(
+    [switch]$Export
+)
+
+$ErrorActionPreference = 'Stop'
+$repositoryRoot = Split-Path -Parent $PSScriptRoot
+$projectRoot = Join-Path $repositoryRoot 'spinny-slots!'
+
+function Find-GodotConsole {
+    $command = Get-Command 'godot4', 'godot' -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($command) {
+        return $command.Source
+    }
+
+    $installRoot = 'C:\Program Files\Godot'
+    if (Test-Path -LiteralPath $installRoot) {
+        $candidate = Get-ChildItem -LiteralPath $installRoot -Filter 'Godot*_console.exe' -File |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+        if ($candidate) {
+            return $candidate.FullName
+        }
+    }
+
+    throw 'Godot was not found. Install Godot 4.7.1 or add godot/godot4 to PATH.'
+}
+
+function Invoke-Checked {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Executable,
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments,
+        [Parameter(Mandatory = $true)]
+        [string]$Description
+    )
+
+    Write-Host "==> $Description"
+    & $Executable @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Description failed with exit code $LASTEXITCODE."
+    }
+}
+
+$godot = Find-GodotConsole
+Write-Host "Using Godot: $godot"
+
+Invoke-Checked -Executable $godot -Description 'Importing and validating the Godot project' -Arguments @(
+    '--headless',
+    '--editor',
+    '--quit',
+    '--path', $projectRoot
+)
+
+Invoke-Checked -Executable $godot -Description 'Running the foundation smoke test' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    '--script', 'res://scripts/dev/smoke_test.gd'
+)
+
+if ($Export) {
+    $buildDirectory = Join-Path $projectRoot 'builds'
+    New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null
+    $exportPath = Join-Path $buildDirectory 'SpinnySlots.exe'
+
+    Invoke-Checked -Executable $godot -Description 'Exporting the Windows release build' -Arguments @(
+        '--headless',
+        '--path', $projectRoot,
+        '--export-release', 'Windows Desktop', $exportPath
+    )
+
+    if (-not (Test-Path -LiteralPath $exportPath -PathType Leaf)) {
+        throw "Godot reported success but did not create $exportPath."
+    }
+
+    Write-Host '==> Launch-checking the exported Windows build'
+    $launchCheck = Start-Process -FilePath $exportPath -ArgumentList @(
+        '--headless',
+        '--quit-after', '3'
+    ) -WindowStyle Hidden -Wait -PassThru
+    if ($launchCheck.ExitCode -ne 0) {
+        throw "The exported Windows build failed its launch check with exit code $($launchCheck.ExitCode)."
+    }
+
+    Write-Host "Windows build: $exportPath"
+}
+
+Write-Host 'Verification complete.'
