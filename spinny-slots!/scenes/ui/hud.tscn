@@ -1,0 +1,258 @@
+[gd_scene format=3 uid="uid://cxbmrjnd5l2j8"]
+
+[ext_resource type="Script" uid="uid://sbtses0kh1nu" path="res://scripts/ui/hud.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://7ojsxm6qkwsd" path="res://assets/art/ui/game_gui/coin_icon.png" id="3_coin"]
+[ext_resource type="Texture2D" uid="uid://nlgx1qy2wf8a" path="res://assets/art/ui/game_gui/gem_icon.png" id="4_gem"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/gear_icon.png" id="5_gear"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
+bg_color = Color(0.82, 0.13, 0.13, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_hover"]
+bg_color = Color(0.95, 0.25, 0.25, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_pressed"]
+bg_color = Color(0.65, 0.08, 0.08, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+
+[node name="Hud" type="CanvasLayer" unique_id=974220878]
+layer = 10
+script = ExtResource("1_script")
+
+[node name="Layout" type="Control" parent="." unique_id=1917700648]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
+
+[node name="SafeMargin" type="MarginContainer" parent="Layout" unique_id=2028917650]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Columns" type="HBoxContainer" parent="Layout/SafeMargin" unique_id=34403131]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="LeftStack" type="VBoxContainer" parent="Layout/SafeMargin/Columns" unique_id=1954961235]
+custom_minimum_size = Vector2(292, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CurrencyPanel" type="PanelContainer" parent="Layout/SafeMargin/Columns/LeftStack" unique_id=824377788]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CurrencyContent" type="VBoxContainer" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel" unique_id=1264689845]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="AreaLabel" type="Label" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent" unique_id=1121224033]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.91, 0.28, 1)
+theme_override_font_sizes/font_size = 18
+text = "JUNKYARD"
+
+[node name="Coins" type="HBoxContainer" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent" unique_id=807208666]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Coins" unique_id=521504847]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Coins" unique_id=1926488808]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Coins"
+vertical_alignment = 1
+
+[node name="CoinValue" type="Label" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Coins" unique_id=1905385961]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "0
+"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Gems" type="HBoxContainer" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent" unique_id=1086761657]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Icon" type="TextureRect" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Gems" unique_id=1343131852]
+custom_minimum_size = Vector2(38, 38)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_gem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Gems" unique_id=1411006775]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Gems"
+vertical_alignment = 1
+
+[node name="GemValue" type="Label" parent="Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Gems" unique_id=1317738502]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="LeftSpacer" type="Control" parent="Layout/SafeMargin/Columns/LeftStack" unique_id=1095026033]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="CenterSpacer" type="Control" parent="Layout/SafeMargin/Columns" unique_id=1434700510]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="UpgradePanel" type="PanelContainer" parent="Layout/SafeMargin/Columns" unique_id=1241166089]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Content" type="VBoxContainer" parent="Layout/SafeMargin/Columns/UpgradePanel" unique_id=253123347]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=1115021652]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "UPGRADES"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=642032550]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Unlocks after the first machine"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="UpgradeRows" type="VBoxContainer" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=761027845]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="PanelSpacer" type="Control" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=1486824123]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="SettingsButton" type="Button" parent="Layout/SafeMargin"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+mouse_default_cursor_shape = 2
+tooltip_text = "Settings"
+icon = ExtResource("5_gear")
+icon_alignment = 1
+
+
+
+[node name="SettingsPanel" type="PanelContainer" parent="Layout"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(320, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -100.0
+offset_right = 160.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="Layout/SettingsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Layout/SettingsPanel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "SETTINGS"
+horizontal_alignment = 1
+
+[node name="VolumeLabel" type="Label" parent="Layout/SettingsPanel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Music Volume"
+horizontal_alignment = 1
+
+[node name="VolumeSlider" type="HSlider" parent="Layout/SettingsPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.3
+
+[node name="CloseButton" type="Button" parent="Layout/SettingsPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
+text = "X"
+
+

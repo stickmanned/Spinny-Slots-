@@ -1,0 +1,92 @@
+[gd_resource type="Theme" format=3 uid="uid://cc06geaag4tw5"]
+
+[ext_resource type="FontFile" uid="uid://dsguyk8e6n3us" path="res://assets/fonts/fredoka_one/fredoka_one_regular.ttf" id="1_font"]
+[ext_resource type="Texture2D" uid="uid://cphouqannl72u" path="res://assets/art/ui/game_gui/panel_patterned.png" id="6_disabled"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_disabled"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+texture = ExtResource("6_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+texture = ExtResource("6_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_normal"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+texture = ExtResource("6_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_pressed"]
+content_margin_left = 18.0
+content_margin_top = 12.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+texture = ExtResource("6_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_panel"]
+content_margin_left = 22.0
+content_margin_top = 16.0
+content_margin_right = 22.0
+content_margin_bottom = 16.0
+texture = ExtResource("6_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[resource]
+default_font = ExtResource("1_font")
+default_font_size = 22
+Button/colors/font_color = Color(1, 1, 1, 1)
+Button/colors/font_disabled_color = Color(0.92, 0.94, 0.98, 1)
+Button/colors/font_hover_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/constants/outline_size = 4
+Button/font_sizes/font_size = 22
+Button/fonts/font = ExtResource("1_font")
+Button/styles/disabled = SubResource("StyleBox_disabled")
+Button/styles/hover = SubResource("StyleBox_hover")
+Button/styles/normal = SubResource("StyleBox_normal")
+Button/styles/pressed = SubResource("StyleBox_pressed")
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/colors/font_outline_color = Color(0, 0, 0, 1)
+Label/constants/outline_size = 4
+Label/font_sizes/font_size = 22
+Label/fonts/font = ExtResource("1_font")
+Panel/styles/panel = SubResource("StyleBox_panel")
+PanelContainer/styles/panel = SubResource("StyleBox_panel")
+RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
+RichTextLabel/colors/font_outline_color = Color(0, 0, 0, 1)
+RichTextLabel/constants/outline_size = 4
+RichTextLabel/font_sizes/normal_font_size = 22
+RichTextLabel/fonts/normal_font = ExtResource("1_font")

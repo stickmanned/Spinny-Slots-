@@ -46,17 +46,16 @@ function Invoke-Checked {
 $godot = Find-GodotConsole
 Write-Host "Using Godot: $godot"
 
-Invoke-Checked -Executable $godot -Description 'Importing and validating the Godot project' -Arguments @(
-    '--headless',
-    '--editor',
-    '--quit',
-    '--path', $projectRoot
-)
-
-Invoke-Checked -Executable $godot -Description 'Running the foundation smoke test' -Arguments @(
+Invoke-Checked -Executable $godot -Description 'Loading and validating the project main scene' -Arguments @(
     '--headless',
     '--path', $projectRoot,
-    '--script', 'res://scripts/dev/smoke_test.gd'
+    '--quit-after', '2'
+)
+
+Invoke-Checked -Executable $godot -Description 'Running the Milestone 2b deterministic dialogue, interaction, and layout checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/smoke_test.tscn'
 )
 
 if ($Export) {
@@ -66,6 +65,7 @@ if ($Export) {
 
     Invoke-Checked -Executable $godot -Description 'Exporting the Windows release build' -Arguments @(
         '--headless',
+        '--recovery-mode',
         '--path', $projectRoot,
         '--export-release', 'Windows Desktop', $exportPath
     )

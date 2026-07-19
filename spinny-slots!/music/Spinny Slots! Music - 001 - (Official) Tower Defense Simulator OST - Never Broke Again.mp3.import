@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dg6377q3n4lpo"
+path="res://.godot/imported/Spinny Slots! Music - 001 - (Official) Tower Defense Simulator OST - Never Broke Again.mp3-89e2dac8aa1b98adc79838f12cbbcec4.mp3str"
+
+[deps]
+
+source_file="res://music/Spinny Slots! Music - 001 - (Official) Tower Defense Simulator OST - Never Broke Again.mp3"
+dest_files=["res://.godot/imported/Spinny Slots! Music - 001 - (Official) Tower Defense Simulator OST - Never Broke Again.mp3-89e2dac8aa1b98adc79838f12cbbcec4.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

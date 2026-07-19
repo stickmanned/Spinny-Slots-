@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://d1n4hbf523n6y"]
+
+[ext_resource type="Script" uid="uid://bk1bhhg26p62f" path="res://scripts/junkyard_job.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://drmbhfuuruto5" path="res://assets/art/junkyard/junkyard_background.png" id="2_background"]
+[ext_resource type="PackedScene" path="res://scenes/props/dumpster.tscn" id="3_dumpster"]
+[ext_resource type="PackedScene" path="res://scenes/props/trash_bag.tscn" id="4_bag"]
+[ext_resource type="PackedScene" uid="uid://cxbmrjnd5l2j8" path="res://scenes/ui/hud.tscn" id="5_hud"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="6_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="7_dialogue"]
+
+[node name="JunkyardJob" type="Control" unique_id=1585590155]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("6_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="." unique_id=129927687]
+modulate = Color(0.48623475, 0.48623475, 0.48623475, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ReadabilityShade" type="ColorRect" parent="." unique_id=2041765576]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.035, 0.045, 0.055, 0.16)
+
+[node name="World" type="Node2D" parent="." unique_id=807982457]
+
+[node name="Dumpster" parent="World" unique_id=1732713320 instance=ExtResource("3_dumpster")]
+unique_name_in_owner = true
+
+[node name="DumpsterSprite" parent="World/Dumpster" index="0"]
+unique_name_in_owner = true
+
+[node name="DumpsterHighlight" parent="World/Dumpster" index="1"]
+unique_name_in_owner = true
+
+[node name="DropZone" parent="World/Dumpster" index="2"]
+unique_name_in_owner = true
+
+[node name="DropShape" parent="World/Dumpster/DropZone" index="0"]
+unique_name_in_owner = true
+
+[node name="TrashBag" parent="World" unique_id=1557767481 instance=ExtResource("4_bag")]
+unique_name_in_owner = true
+z_index = 2
+
+[node name="BagSprite" parent="World/TrashBag" index="0"]
+unique_name_in_owner = true
+
+[node name="BagShape" parent="World/TrashBag" index="1"]
+unique_name_in_owner = true
+
+[node name="Hud" parent="." unique_id=1371256553 instance=ExtResource("5_hud")]
+
+[node name="TutorialLayer" type="CanvasLayer" parent="." unique_id=1579297310]
+layer = 15
+
+[node name="Overlay" type="Control" parent="TutorialLayer" unique_id=260793085]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+
+[node name="TutorialPrompt" type="PanelContainer" parent="TutorialLayer/Overlay" unique_id=584328425]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(620, 66)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -310.0
+offset_top = 16.0
+offset_right = 310.0
+offset_bottom = 82.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="TutorialLayer/Overlay/TutorialPrompt" unique_id=861271046]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Drag the trash bag into the dumpster."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DialogueBox" parent="." unique_id=859040184 instance=ExtResource("7_dialogue")]
+
+[editable path="World/Dumpster"]
+[editable path="World/TrashBag"]

@@ -1,69 +1,7 @@
 [gd_scene format=3 uid="uid://cmlck0tye5c2q"]
 
-[node name="Main" type="Control" unique_id=1088440547]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[ext_resource type="PackedScene" uid="uid://d1n4hbf523n6y" path="res://scenes/junkyard_job.tscn" id="1_job"]
 
-[node name="Background" type="ColorRect" parent="." unique_id=839840022]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.055, 0.063, 0.071, 1)
+[node name="Main" type="Node" unique_id=2104289412]
 
-[node name="Center" type="CenterContainer" parent="." unique_id=2038298312]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="FoundationPanel" type="PanelContainer" parent="Center" unique_id=564061598]
-custom_minimum_size = Vector2(720, 360)
-layout_mode = 2
-
-[node name="Margin" type="MarginContainer" parent="Center/FoundationPanel" unique_id=1425417312]
-layout_mode = 2
-theme_override_constants/margin_left = 56
-theme_override_constants/margin_top = 44
-theme_override_constants/margin_right = 56
-theme_override_constants/margin_bottom = 44
-
-[node name="Content" type="VBoxContainer" parent="Center/FoundationPanel/Margin" unique_id=877000715]
-layout_mode = 2
-theme_override_constants/separation = 22
-
-[node name="Eyebrow" type="Label" parent="Center/FoundationPanel/Margin/Content" unique_id=131441532]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.76, 0.63, 0.28, 1)
-theme_override_font_sizes/font_size = 16
-text = "MILESTONE 0  •  FOUNDATION"
-horizontal_alignment = 1
-
-[node name="Title" type="Label" parent="Center/FoundationPanel/Margin/Content" unique_id=1785648366]
-layout_mode = 2
-theme_override_font_sizes/font_size = 48
-text = "Spinny Slots"
-horizontal_alignment = 1
-
-[node name="Status" type="Label" parent="Center/FoundationPanel/Margin/Content" unique_id=1218660413]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.73, 0.76, 1)
-theme_override_font_sizes/font_size = 20
-text = "Godot project ready. Next: build the Cardboard Spinner gray-box."
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="Scope" type="Label" parent="Center/FoundationPanel/Margin/Content" unique_id=299688036]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.52, 0.56, 0.59, 1)
-theme_override_font_sizes/font_size = 16
-text = "Single-player  •  Offline  •  Fictional in-game money only"
-horizontal_alignment = 1
+[node name="JunkyardJob" parent="." unique_id=1386137158 instance=ExtResource("1_job")]

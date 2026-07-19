@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/junkyard/dumpster.png" id="1_texture"]
+
+[sub_resource type="RectangleShape2D" id="Rectangle_drop"]
+size = Vector2(360, 115)
+
+[node name="Dumpster" type="Node2D"]
+
+[node name="DumpsterSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_texture")
+scale = Vector2(0.27, 0.27)
+
+[node name="DumpsterHighlight" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(1, 0.9, 0.32, 0.42)
+texture = ExtResource("1_texture")
+scale = Vector2(0.278, 0.278)
+
+[node name="DropZone" type="Area2D" parent="."]
+position = Vector2(0, -45)
+collision_layer = 4
+collision_mask = 2
+monitoring = true
+monitorable = true
+
+[node name="DropShape" type="CollisionShape2D" parent="DropZone"]
+shape = SubResource("Rectangle_drop")

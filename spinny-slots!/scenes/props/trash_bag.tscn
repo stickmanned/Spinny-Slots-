@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/junkyard/trash_bag.png" id="1_texture"]
+
+[sub_resource type="RectangleShape2D" id="Rectangle_bag"]
+size = Vector2(150, 190)
+
+[node name="TrashBag" type="Area2D"]
+collision_layer = 2
+collision_mask = 4
+monitoring = true
+monitorable = true
+
+[node name="BagSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_texture")
+scale = Vector2(0.16, 0.16)
+
+[node name="BagShape" type="CollisionShape2D" parent="."]
+shape = SubResource("Rectangle_bag")

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/upgrade_row.gd" id="1_script"]
+
+[node name="UpgradeRow" type="Button"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+disabled = true
+text = "Upgrade"
+script = ExtResource("1_script")
