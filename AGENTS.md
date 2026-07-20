@@ -38,3 +38,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\export-windows.ps1
 ```
 
 When gameplay logic is introduced, add deterministic tests alongside it and include those tests in `tools/verify.ps1`.
+
+## Agent skills
+
+On-demand skill packages live in `.claude/skills/` (Claude Code) and `.agents/skills/`
+(Codex CLI, Antigravity) — same content, duplicated for each tool's discovery path. Reach
+for them by name or let the agent auto-trigger on a matching task:
+
+- `godot-architecture-review` — outcome-before-animation, data/UI separation, autoload and
+  signal conventions, static typing.
+- `godot-performance-profiling` — profiling workflow, hot-path/tween/signal-handler
+  pitfalls, reel/VFX and memory guidance.
+- `slot-systems-design` — the outcome pipeline, paytable/RNG design, boss-battle fairness,
+  story/dialogue state-machine conventions.
+- `godot-build-pipeline` — `tools/verify.ps1` / `tools/export-windows.ps1` usage, adding a
+  new deterministic test, asset licensing, vendored `addons/` handling.
+
+These restate and expand this file's rules with concrete, code-level detail; this file
+remains the source of truth if the two ever disagree.

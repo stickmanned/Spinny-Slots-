@@ -1,0 +1,89 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/machine_selector_panel.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/arrow_left.svg" id="3_left_arrow"]
+[ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/arrow_right.svg" id="4_right_arrow"]
+[ext_resource type="PackedScene" path="res://scenes/ui/reel_strip.tscn" id="5_reel_strip"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBox_transparent"]
+
+[node name="MachineSelectorPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(560, 480)
+theme = ExtResource("2_theme")
+theme_override_styles/panel = SubResource("StyleBox_transparent")
+script = ExtResource("1_script")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="Label" parent="Content"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "JUNKYARD MACHINES"
+horizontal_alignment = 1
+
+[node name="SelectorRow" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 26
+
+[node name="LeftArrow" type="TextureButton" parent="Content/SelectorRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 96)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("3_left_arrow")
+texture_pressed = ExtResource("3_left_arrow")
+texture_hover = ExtResource("3_left_arrow")
+texture_disabled = ExtResource("3_left_arrow")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CabinetArt" type="TextureRect" parent="Content/SelectorRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(432, 470)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+transform_pivot_offset = Vector2(216, 235)
+
+[node name="ReelStrip" parent="Content/SelectorRow/CabinetArt" instance=ExtResource("5_reel_strip")]
+unique_name_in_owner = true
+
+[node name="RightArrow" type="TextureButton" parent="Content/SelectorRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 96)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("4_right_arrow")
+texture_pressed = ExtResource("4_right_arrow")
+texture_hover = ExtResource("4_right_arrow")
+texture_disabled = ExtResource("4_right_arrow")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="MachineName" type="Label" parent="Content"]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 30
+text = "Machine"
+horizontal_alignment = 1
+
+[node name="SelectButton" type="Button" parent="Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "USE MACHINE"

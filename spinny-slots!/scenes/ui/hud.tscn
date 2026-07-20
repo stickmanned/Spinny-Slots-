@@ -149,98 +149,162 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="UpgradePanel" type="PanelContainer" parent="Layout/SafeMargin/Columns" unique_id=1241166089]
-unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0)
-custom_minimum_size = Vector2(340, 0)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="Content" type="VBoxContainer" parent="Layout/SafeMargin/Columns/UpgradePanel" unique_id=253123347]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 14
-
-[node name="Title" type="Label" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=1115021652]
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "UPGRADES"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=642032550]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 16
-text = "Unlocks after the first machine"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="UpgradeRows" type="VBoxContainer" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=761027845]
-unique_name_in_owner = true
+[node name="RightStack" type="VBoxContainer" parent="Layout/SafeMargin/Columns"]
+custom_minimum_size = Vector2(292, 0)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="PanelSpacer" type="Control" parent="Layout/SafeMargin/Columns/UpgradePanel/Content" unique_id=1486824123]
+[node name="TopRightButtons" type="HBoxContainer" parent="Layout/SafeMargin/Columns/RightStack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
-size_flags_vertical = 3
+alignment = 2
 mouse_filter = 2
+theme_override_constants/separation = 10
 
-[node name="SettingsButton" type="Button" parent="Layout/SafeMargin"]
+[node name="SettingsButton" type="Button" parent="Layout/SafeMargin/Columns/RightStack/TopRightButtons"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 0
 mouse_default_cursor_shape = 2
 tooltip_text = "Settings"
 icon = ExtResource("5_gear")
 icon_alignment = 1
 
-
-
-[node name="SettingsPanel" type="PanelContainer" parent="Layout"]
+[node name="UpgradePanel" type="PanelContainer" parent="Layout/SafeMargin/Columns/RightStack" unique_id=1241166089]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(292, 0)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Content" type="VBoxContainer" parent="Layout/SafeMargin/Columns/RightStack/UpgradePanel" unique_id=253123347]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Layout/SafeMargin/Columns/RightStack/UpgradePanel/Content" unique_id=1115021652]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "UPGRADES"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Layout/SafeMargin/Columns/RightStack/UpgradePanel/Content" unique_id=642032550]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Improve your machine"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="UpgradeRows" type="VBoxContainer" parent="Layout/SafeMargin/Columns/RightStack/UpgradePanel/Content" unique_id=761027845]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="PanelSpacer" type="Control" parent="Layout/SafeMargin/Columns/RightStack/UpgradePanel/Content" unique_id=1486824123]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+
+
+[node name="SettingsLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 40
 visible = false
-custom_minimum_size = Vector2(320, 200)
+
+[node name="ModalRoot" type="Control" parent="SettingsLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="SettingsDim" type="ColorRect" parent="SettingsLayer/ModalRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.015, 0.025, 0.055, 0.58)
+
+[node name="SettingsPanel" type="PanelContainer" parent="SettingsLayer/ModalRoot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 340)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -100.0
-offset_right = 160.0
-offset_bottom = 100.0
+offset_left = -180.0
+offset_top = -200.0
+offset_right = 180.0
+offset_bottom = 200.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Content" type="VBoxContainer" parent="Layout/SettingsPanel"]
+[node name="Content" type="VBoxContainer" parent="SettingsLayer/ModalRoot/SettingsPanel"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Layout/SettingsPanel/Content"]
+[node name="Title" type="Label" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "SETTINGS"
 horizontal_alignment = 1
 
-[node name="VolumeLabel" type="Label" parent="Layout/SettingsPanel/Content"]
+[node name="VolumeLabel" type="Label" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Music Volume"
 horizontal_alignment = 1
 
-[node name="VolumeSlider" type="HSlider" parent="Layout/SettingsPanel/Content"]
+[node name="VolumeSlider" type="HSlider" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 max_value = 1.0
 step = 0.01
 value = 0.3
 
-[node name="CloseButton" type="Button" parent="Layout/SettingsPanel"]
+[node name="ResolutionLabel" type="Label" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Screen Resolution"
+horizontal_alignment = 1
+
+[node name="ResolutionDropdown" type="OptionButton" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="ReducedMotionButton" type="Button" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "REDUCED MOTION: OFF"
+
+[node name="SfxButton" type="Button" parent="SettingsLayer/ModalRoot/SettingsPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+toggle_mode = true
+text = "SOUND EFFECTS: ON"
+
+[node name="CloseButton" type="Button" parent="SettingsLayer/ModalRoot/SettingsPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -254,5 +318,3 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
 text = "X"
-
-

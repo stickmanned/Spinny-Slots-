@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="MachineDefinition" format=3 uid="uid://bddxtwno5skr8"]
+
+[ext_resource type="Script" uid="uid://doojsttcurv5f" path="res://scripts/machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" uid="uid://cuwg37dvumn2c" path="res://resources/machines/can crusher.png" id="2_cabinet"]
+[ext_resource type="Script" uid="uid://d2fpwjsfqs66" path="res://scripts/slot_symbol.gd" id="3_symbol"]
+[ext_resource type="Texture2D" uid="uid://bayl4e5yadcbs" path="res://assets/icons/Can Crusher/can.png" id="4_can_icon"]
+[ext_resource type="Texture2D" uid="uid://bnnp8ant641na" path="res://assets/icons/Can Crusher/cube.png" id="5_cube_icon"]
+[ext_resource type="Texture2D" uid="uid://v3sipgn2w4tl" path="res://assets/icons/Can Crusher/goldscrap.png" id="6_scrap_icon"]
+[ext_resource type="Texture2D" uid="uid://cvx3wxn6d65cl" path="res://resources/tickets/can crusher ticket.png" id="7_ticket"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("2_cabinet")
+region = Rect2(394, 250, 1110, 1502)
+
+[sub_resource type="Resource" id="Symbol_can"]
+script = ExtResource("3_symbol")
+symbol_id = &"can"
+display_name = "Dented Can"
+icon = ExtResource("4_can_icon")
+payout = 22
+weight = 62.0
+
+[sub_resource type="Resource" id="Symbol_cube"]
+script = ExtResource("3_symbol")
+symbol_id = &"cube"
+display_name = "Crushed Cube"
+icon = ExtResource("5_cube_icon")
+payout = 55
+weight = 31.0
+
+[sub_resource type="Resource" id="Symbol_scrap"]
+script = ExtResource("3_symbol")
+symbol_id = &"scrap"
+display_name = "Golden Scrap"
+icon = ExtResource("6_scrap_icon")
+payout = 220
+weight = 7.0
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("7_ticket")
+region = Rect2(333, 635, 1343, 723)
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"can_crusher"
+display_name = "Can Crusher"
+ticket_price = 150
+rarest_symbol_gem_reward = 3
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+symbols = Array[ExtResource("3_symbol")]([SubResource("Symbol_can"), SubResource("Symbol_cube"), SubResource("Symbol_scrap")])
+screen_region = Rect2(166, 418, 684, 480)

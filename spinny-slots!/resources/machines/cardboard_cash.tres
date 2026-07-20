@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="MachineDefinition" format=3 uid="uid://py8y2opqoio1"]
+
+[ext_resource type="Script" uid="uid://doojsttcurv5f" path="res://scripts/machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" uid="uid://btnx6rq0afgmb" path="res://resources/tickets/cardboard cash ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" uid="uid://dg6ovtppm5kqk" path="res://resources/machines/Cardboard Cash.png" id="3_cabinet"]
+[ext_resource type="Script" uid="uid://d2fpwjsfqs66" path="res://scripts/slot_symbol.gd" id="4_symbol"]
+[ext_resource type="Texture2D" uid="uid://21en1d7u3y2g" path="res://assets/icons/Cardboard Cash/box.png" id="5_box_icon"]
+[ext_resource type="Texture2D" uid="uid://mwwgmwkm05hv" path="res://assets/icons/Cardboard Cash/tape.png" id="6_tape_icon"]
+[ext_resource type="Texture2D" uid="uid://b4ge7w3eq3hmi" path="res://assets/icons/Cardboard Cash/gbox.png" id="7_gold_box_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(430, 220, 1240, 1540)
+
+[sub_resource type="Resource" id="Symbol_box"]
+script = ExtResource("4_symbol")
+symbol_id = &"box"
+display_name = "Cardboard Box"
+icon = ExtResource("5_box_icon")
+payout = 10
+weight = 60.0
+
+[sub_resource type="Resource" id="Symbol_tape"]
+script = ExtResource("4_symbol")
+symbol_id = &"tape"
+display_name = "Tape Roll"
+icon = ExtResource("6_tape_icon")
+payout = 15
+weight = 32.0
+
+[sub_resource type="Resource" id="Symbol_gold_box"]
+script = ExtResource("4_symbol")
+symbol_id = &"gold_box"
+display_name = "Golden Box"
+icon = ExtResource("7_gold_box_icon")
+payout = 40
+weight = 8.0
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(430, 680, 1225, 625)
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"cardboard_cash"
+display_name = "Cardboard Cash"
+ticket_price = 30
+rarest_symbol_gem_reward = 1
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_box"), SubResource("Symbol_tape"), SubResource("Symbol_gold_box")])
+screen_region = Rect2(254, 412, 634, 384)

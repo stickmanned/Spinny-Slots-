@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://c21awsbh1gjrk"]
+
+[ext_resource type="Script" uid="uid://cy37ylm0hty2" path="res://scripts/upgrade_config.gd" id="1_config"]
+[ext_resource type="Texture2D" uid="uid://7ojsxm6qkwsd" path="res://assets/art/ui/game_gui/coin_icon.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_config")
+upgrade_id = &"coin_multiplier"
+display_name = "Multiplier"
+icon = ExtResource("2_icon")
+base_cost = 200
+max_level = 10
+tooltip = "Multiplies coins gained for every spin payout"

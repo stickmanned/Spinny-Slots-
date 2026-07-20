@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3 uid="uid://djh7uxbahvxx4"]
+
+[ext_resource type="Script" uid="uid://blav7ev17wi1f" path="res://scripts/dialogue_data.gd" id="1_dialogue"]
+
+[resource]
+script = ExtResource("1_dialogue")
+lines = Array[String](["You hate your job, huh?", "I got a solution for you!", "You can buy a slot machine ticket."])

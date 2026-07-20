@@ -1,0 +1,34 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/reel_strip.gd" id="1_script"]
+
+[node name="ReelStrip" type="Control"]
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Window0" type="Control" parent="."]
+mouse_filter = 2
+clip_contents = true
+
+[node name="Icon" type="TextureRect" parent="Window0"]
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Window1" type="Control" parent="."]
+mouse_filter = 2
+clip_contents = true
+
+[node name="Icon" type="TextureRect" parent="Window1"]
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Window2" type="Control" parent="."]
+mouse_filter = 2
+clip_contents = true
+
+[node name="Icon" type="TextureRect" parent="Window2"]
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5

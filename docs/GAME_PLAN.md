@@ -113,7 +113,7 @@ The day job remains available after slots unlock. It acts as a narrative reminde
 
 ### Phone call
 
-- The phone rings after the player earns approximately $12.
+- The phone rings after the player reaches the configured Junkyard threshold (currently $30).
 - The world dims and a phone panel slides in from the right.
 - The rich kid delivers a short conversation, no more than several lines at once.
 - The player learns that a cardboard machine is hidden nearby.
@@ -122,7 +122,7 @@ The day job remains available after slots unlock. It acts as a narrative reminde
 
 ### First spin
 
-- The cardboard machine costs $2 per spin.
+- Each machine spin consumes one machine-specific ticket. Cardboard Cash tickets currently cost $30.
 - The first few results are protected from causing immediate bankruptcy.
 - The machine displays its possible symbols and payout rules.
 - The first win introduces the upgrade panel.
@@ -169,11 +169,11 @@ The result is chosen before the animation begins. Reels animate toward that pred
 
 ## 8. Junkyard area
 
-The first shipped chapter should ultimately contain five machines. Development begins with only the Cardboard Spinner.
+The first shipped chapter should ultimately contain five machines. Development begins with only Cardboard Cash.
 
 | Machine | Theme | Special mechanic |
 |---|---|---|
-| Cardboard Spinner | Cardboard, tape, marker symbols | Standard three-reel rules; teaches the game |
+| Cardboard Cash | Cardboard, tape, marker symbols | Standard three-reel rules; teaches the game |
 | Can Crusher | Crushed cans and a hydraulic press | Matching cans collapse and reroll once |
 | Scrap Sorter | Conveyor belts and mechanical claws | Player can hold one reel before the next spin |
 | Magnet Machine | Coils, batteries, and an electromagnet | A charged magnet can pull one symbol toward a match |

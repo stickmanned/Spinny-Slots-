@@ -1,0 +1,48 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/odds_row.gd" id="1_script"]
+
+[node name="OddsRow" type="HBoxContainer"]
+mouse_filter = 2
+theme_override_constants/separation = 8
+script = ExtResource("1_script")
+
+[node name="Icon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+text = "Symbol"
+vertical_alignment = 1
+text_overrun_behavior = 3
+
+[node name="ValueLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.55, 0.95, 0.55, 1)
+theme_override_font_sizes/font_size = 14
+text = "$0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PercentLabel" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_font_sizes/font_size = 14
+text = "0%"
+horizontal_alignment = 2
+vertical_alignment = 1

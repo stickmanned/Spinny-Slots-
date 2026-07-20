@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ticket_list_row.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
+
+[node name="TicketListRow" type="Button"]
+custom_minimum_size = Vector2(0, 78)
+theme = ExtResource("2_theme")
+toggle_mode = true
+mouse_default_cursor_shape = 2
+tooltip_text = "Buy ticket"
+script = ExtResource("1_script")
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Content" type="HBoxContainer" parent="ContentMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="TicketArt" type="TextureRect" parent="ContentMargin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 54)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TicketDetails" type="VBoxContainer" parent="ContentMargin/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 1
+
+[node name="MachineName" type="Label" parent="ContentMargin/Content/TicketDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+text = "Machine"
+vertical_alignment = 1
+
+[node name="PriceLabel" type="Label" parent="ContentMargin/Content/TicketDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_font_sizes/font_size = 15
+text = "$0"

@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="MachineDefinition" format=3 uid="uid://bak00rb1v6hp"]
+
+[ext_resource type="Script" uid="uid://doojsttcurv5f" path="res://scripts/machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" uid="uid://dot3hdw0jgp1s" path="res://resources/machines/Magnet Machine.png" id="2_cabinet"]
+[ext_resource type="Script" uid="uid://d2fpwjsfqs66" path="res://scripts/slot_symbol.gd" id="3_symbol"]
+[ext_resource type="Texture2D" uid="uid://b1jlyxyj2momk" path="res://assets/icons/Magnet Machine/spentBattery.png" id="4_battery_icon"]
+[ext_resource type="Texture2D" uid="uid://dd4v1c1ylfmav" path="res://assets/icons/Magnet Machine/coil.png" id="5_coil_icon"]
+[ext_resource type="Texture2D" uid="uid://dssuhfklrvpac" path="res://assets/icons/Magnet Machine/magnet.png" id="6_magnet_icon"]
+[ext_resource type="Texture2D" uid="uid://cshjfj2ghwj4p" path="res://resources/tickets/Magnet Machine Ticket.png" id="7_ticket"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("2_cabinet")
+region = Rect2(476, 234, 1114, 1494)
+
+[sub_resource type="Resource" id="Symbol_battery"]
+script = ExtResource("3_symbol")
+symbol_id = &"battery"
+display_name = "Spent Battery"
+icon = ExtResource("4_battery_icon")
+payout = 170
+weight = 65.0
+
+[sub_resource type="Resource" id="Symbol_coil"]
+script = ExtResource("3_symbol")
+symbol_id = &"coil"
+display_name = "Charged Coil"
+icon = ExtResource("5_coil_icon")
+payout = 350
+weight = 31.0
+
+[sub_resource type="Resource" id="Symbol_magnet"]
+script = ExtResource("3_symbol")
+symbol_id = &"magnet"
+display_name = "Lightning Magnet"
+icon = ExtResource("6_magnet_icon")
+payout = 2000
+weight = 4.0
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("7_ticket")
+region = Rect2(281, 594, 1438, 813)
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"magnet_machine"
+display_name = "Magnet Machine"
+ticket_price = 1000
+rarest_symbol_gem_reward = 8
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+symbols = Array[ExtResource("3_symbol")]([SubResource("Symbol_battery"), SubResource("Symbol_coil"), SubResource("Symbol_magnet")])
+screen_region = Rect2(252, 654, 548, 332)

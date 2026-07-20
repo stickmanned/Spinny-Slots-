@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://diibcut0sdae1"]
+
+[ext_resource type="Script" uid="uid://cy37ylm0hty2" path="res://scripts/upgrade_config.gd" id="1_config"]
+[ext_resource type="Texture2D" uid="uid://dexb8i25jdpp0" path="res://assets/icons/flash.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_config")
+upgrade_id = &"spin_speed"
+display_name = "Spin Speed"
+icon = ExtResource("2_icon")
+effect_per_level = 0.25
+tooltip = "Increases each spin's speed"

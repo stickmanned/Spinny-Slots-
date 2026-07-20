@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal finished
 signal character_revealed(character: String)
+signal faded_out
 
 @export_range(1.0, 120.0, 1.0) var chars_per_second := 32.0
 @export_range(0.0, 1.0, 0.01) var fade_in_duration := 0.18
@@ -9,6 +10,8 @@ signal character_revealed(character: String)
 @onready var dialogue_panel: PanelContainer = %DialoguePanel
 @onready var message: RichTextLabel = %Message
 @onready var continue_indicator: Label = %ContinueIndicator
+@onready var portrait: TextureRect = %Portrait
+@onready var speaker_name: Label = %SpeakerName
 
 var _lines: Array[String] = []
 var _line_index := -1
@@ -80,6 +83,55 @@ func play(lines: Array[String]) -> void:
 	_show_next_line()
 
 
+func use_standard_layout() -> void:
+	portrait.visible = false
+	speaker_name.visible = false
+	dialogue_panel.custom_minimum_size = Vector2(860.0, 92.0)
+	dialogue_panel.anchor_left = 0.5
+	dialogue_panel.anchor_top = 0.0
+	dialogue_panel.anchor_right = 0.5
+	dialogue_panel.anchor_bottom = 0.0
+	dialogue_panel.offset_left = -430.0
+	dialogue_panel.offset_top = 12.0
+	dialogue_panel.offset_right = 430.0
+	dialogue_panel.offset_bottom = 104.0
+	message.offset_left = 0.0
+	message.offset_top = 0.0
+	message.offset_right = -24.0
+	message.offset_bottom = 0.0
+	message.add_theme_font_size_override("normal_font_size", 22)
+
+
+func use_phone_call_layout(call_speaker: String, call_portrait: Texture2D) -> void:
+	portrait.texture = call_portrait
+	portrait.visible = call_portrait != null
+	speaker_name.text = call_speaker
+	speaker_name.visible = not call_speaker.is_empty()
+	dialogue_panel.custom_minimum_size = Vector2(1040.0, 296.0)
+	dialogue_panel.anchor_left = 0.5
+	dialogue_panel.anchor_top = 1.0
+	dialogue_panel.anchor_right = 0.5
+	dialogue_panel.anchor_bottom = 1.0
+	dialogue_panel.offset_left = -520.0
+	dialogue_panel.offset_top = -320.0
+	dialogue_panel.offset_right = 520.0
+	dialogue_panel.offset_bottom = -24.0
+	portrait.offset_left = 0.0
+	portrait.offset_top = 32.0
+	portrait.offset_right = 232.0
+	portrait.offset_bottom = 256.0
+	speaker_name.offset_left = 0.0
+	speaker_name.offset_top = 0.0
+	speaker_name.offset_right = 232.0
+	speaker_name.offset_bottom = 36.0
+	speaker_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	message.offset_left = 260.0
+	message.offset_top = 24.0
+	message.offset_right = -28.0
+	message.offset_bottom = -20.0
+	message.add_theme_font_size_override("normal_font_size", 38)
+
+
 func advance() -> void:
 	if not _is_playing:
 		return
@@ -102,6 +154,7 @@ func fade_out(duration: float) -> void:
 	_fade_tween = create_tween()
 	_fade_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	_fade_tween.tween_property(dialogue_panel, "modulate:a", 0.0, duration)
+	_fade_tween.tween_callback(faded_out.emit)
 
 
 func is_typing() -> bool:

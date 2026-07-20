@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ticket_shop_panel.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
+
+[node name="TicketShopPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(292, 178)
+clip_contents = false
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="Label" parent="Content/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "TICKETS"
+
+[node name="BalanceLabel" type="Label" parent="Content/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_font_sizes/font_size = 20
+text = "$0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="TicketScroll" type="ScrollContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+clip_contents = false
+horizontal_scroll_mode = 0
+
+[node name="TicketRows" type="VBoxContainer" parent="Content/TicketScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8

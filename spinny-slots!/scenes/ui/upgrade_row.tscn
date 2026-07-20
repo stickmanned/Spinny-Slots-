@@ -1,11 +1,75 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/upgrade_row.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
 
 [node name="UpgradeRow" type="Button"]
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-disabled = true
-text = "Upgrade"
+theme = ExtResource("2_theme")
 script = ExtResource("1_script")
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Content" type="HBoxContainer" parent="ContentMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="UpgradeIcon" type="TextureRect" parent="ContentMargin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="VBoxContainer" parent="ContentMargin/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="UpgradeName" type="Label" parent="ContentMargin/Content/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_font_sizes/font_size = 17
+text = "Upgrade"
+vertical_alignment = 2
+text_overrun_behavior = 3
+
+[node name="UpgradeStatus" type="Label" parent="ContentMargin/Content/Details"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_font_sizes/font_size = 15
+text = "LV 0  •  1x"
+vertical_alignment = 0
+
+[node name="CostLabel" type="Label" parent="ContentMargin/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "$0"
+horizontal_alignment = 2
+vertical_alignment = 1

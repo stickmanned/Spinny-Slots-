@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://debuf28yb71up"]
+
+[ext_resource type="Script" uid="uid://csbitje8u58fi" path="res://scripts/ui/phone_notification.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBox_phone_empty"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_badge"]
+bg_color = Color(0.91, 0.08, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="PhoneNotification" type="CanvasLayer" unique_id=812460391]
+layer = 18
+script = ExtResource("1_script")
+
+[node name="Overlay" type="Control" parent="." unique_id=1036254649]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
+
+[node name="PhoneButton" type="Button" parent="Overlay" unique_id=804603377]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.715
+anchor_right = 0.715
+offset_left = -46.0
+offset_top = 24.0
+offset_right = 46.0
+offset_bottom = 174.0
+grow_horizontal = 2
+tooltip_text = "Answer phone (P)"
+mouse_default_cursor_shape = 2
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(0.68, 0.86, 0.96, 1)
+theme_override_colors/icon_hover_color = Color(0.84, 0.96, 1, 1)
+theme_override_colors/icon_disabled_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBox_phone_empty")
+theme_override_styles/pressed = SubResource("StyleBox_phone_empty")
+theme_override_styles/hover = SubResource("StyleBox_phone_empty")
+theme_override_styles/disabled = SubResource("StyleBox_phone_empty")
+theme_override_styles/focus = SubResource("StyleBox_phone_empty")
+expand_icon = true
+
+[node name="Badge" type="Label" parent="Overlay/PhoneButton" unique_id=1530869371]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -24.0
+offset_top = -10.0
+offset_right = 12.0
+offset_bottom = 26.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = SubResource("StyleBox_badge")
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1

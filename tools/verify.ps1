@@ -58,6 +58,30 @@ Invoke-Checked -Executable $godot -Description 'Running the Milestone 2b determi
     'res://scenes/dev/smoke_test.tscn'
 )
 
+Invoke-Checked -Executable $godot -Description 'Running the Milestone 2c phone, ticket, selector, and machine-loop checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/milestone_2c_test.tscn'
+)
+
+Invoke-Checked -Executable $godot -Description 'Running the Milestone 3 paytable, weighted RNG, and odds panel checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/milestone_3_symbols_test.tscn'
+)
+
+Invoke-Checked -Executable $godot -Description 'Running the Milestone 3b upgrade, audio-sync, and interaction-safety checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/milestone_3b_upgrades_test.tscn'
+)
+
+Invoke-Checked -Executable $godot -Description 'Running the Milestone 3c rarest-symbol gem bonus and confetti checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/milestone_3c_rare_bonus_test.tscn'
+)
+
 if ($Export) {
     $buildDirectory = Join-Path $projectRoot 'builds'
     New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null

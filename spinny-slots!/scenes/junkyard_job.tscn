@@ -7,6 +7,28 @@
 [ext_resource type="PackedScene" uid="uid://cxbmrjnd5l2j8" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="6_theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="7_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/ui/phone_notification.tscn" id="8_phone"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ticket_shop_panel.tscn" id="9_ticket_shop"]
+[ext_resource type="PackedScene" path="res://scenes/ui/machine_selector_panel.tscn" id="10_selector"]
+[ext_resource type="PackedScene" path="res://scenes/ui/odds_panel.tscn" id="11_odds"]
+[ext_resource type="Script" path="res://scripts/ui/coin_collection_effect.gd" id="12_coin_effect"]
+[ext_resource type="Script" path="res://scripts/ui/confetti_effect.gd" id="13_confetti_effect"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_spotlight"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.86, 0.18, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
 
 [node name="JunkyardJob" type="Control" unique_id=1585590155]
 layout_mode = 3
@@ -69,6 +91,214 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 
 [node name="Hud" parent="." unique_id=1371256553 instance=ExtResource("5_hud")]
+
+[node name="CoinEffectLayer" type="CanvasLayer" parent="."]
+layer = 30
+
+[node name="CoinCollectionEffect" type="Control" parent="CoinEffectLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_coin_effect")
+
+[node name="ConfettiEffectLayer" type="CanvasLayer" parent="."]
+layer = 31
+
+[node name="ConfettiEffect" type="Control" parent="ConfettiEffectLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("13_confetti_effect")
+
+[node name="PurchaseLayer" type="CanvasLayer" parent="." unique_id=1659663709]
+unique_name_in_owner = true
+layer = 19
+visible = false
+
+[node name="Overlay" type="Control" parent="PurchaseLayer" unique_id=252714910]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+
+[node name="SpotlightDim" type="ColorRect" parent="PurchaseLayer/Overlay" unique_id=1585171708]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.015, 0.025, 0.055, 0.5)
+
+[node name="PulseOutline" type="Panel" parent="PurchaseLayer/Overlay" unique_id=1002181376]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 168.0
+offset_right = 322.0
+offset_bottom = -18.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBox_spotlight")
+
+[node name="TicketLayer" type="CanvasLayer" parent="." unique_id=2063408835]
+unique_name_in_owner = true
+layer = 21
+visible = false
+
+[node name="Overlay" type="Control" parent="TicketLayer" unique_id=2023746479]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+
+[node name="LeftColumn" type="VBoxContainer" parent="TicketLayer/Overlay" unique_id=1441613400]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 174.0
+offset_right = 316.0
+offset_bottom = -24.0
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="MachineTicketShop" parent="TicketLayer/Overlay/LeftColumn" unique_id=1441613386 instance=ExtResource("9_ticket_shop")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="OddsPanel" parent="TicketLayer/Overlay/LeftColumn" unique_id=87892886 instance=ExtResource("11_odds")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+
+[node name="SelectorLayer" type="CanvasLayer" parent="." unique_id=1413251385]
+unique_name_in_owner = true
+layer = 17
+visible = false
+
+[node name="Overlay" type="Control" parent="SelectorLayer" unique_id=98280634]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+
+[node name="MachineArea" type="VBoxContainer" parent="SelectorLayer/Overlay" unique_id=2068409350]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -314.0
+offset_top = 42.0
+offset_right = 314.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="MachineSelectorPanel" parent="SelectorLayer/Overlay/MachineArea" unique_id=1570725820 instance=ExtResource("10_selector")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ResultLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea" unique_id=1993000523]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpacerTop" type="Control" parent="SelectorLayer/Overlay/MachineArea"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="PayoutLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea" unique_id=31932635]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
+theme_override_constants/outline_size = 9
+theme_override_font_sizes/font_size = 38
+horizontal_alignment = 1
+
+[node name="SpinButton" type="Button" parent="SelectorLayer/Overlay/MachineArea" unique_id=666876463]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(276, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 34
+text = "SPIN"
+
+[node name="SpacerBottom" type="Control" parent="SelectorLayer/Overlay/MachineArea"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+mouse_filter = 2
+
+[node name="PhoneNotification" parent="." unique_id=1126243464 instance=ExtResource("8_phone")]
+unique_name_in_owner = true
+
+[node name="CallDimLayer" type="CanvasLayer" parent="." unique_id=368627165]
+layer = 19
+
+[node name="Overlay" type="Control" parent="CallDimLayer" unique_id=204509127]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CallDim" type="ColorRect" parent="CallDimLayer/Overlay" unique_id=800755146]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
 
 [node name="TutorialLayer" type="CanvasLayer" parent="." unique_id=1579297310]
 layer = 15

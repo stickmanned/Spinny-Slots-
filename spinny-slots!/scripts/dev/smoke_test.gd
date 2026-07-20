@@ -64,16 +64,17 @@ func _verify_layout(job: Control, resolution: Vector2i) -> void:
 	var viewport_bounds := Rect2(Vector2.ZERO, Vector2(resolution))
 	var dumpster: Node2D = job.get_node("World/Dumpster")
 	var bag: Area2D = job.get_node("World/TrashBag")
-	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/UpgradePanel")
+	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/RightStack/UpgradePanel")
 	var currency_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/LeftStack/CurrencyPanel")
 	var dialogue_panel: PanelContainer = job.get_node("DialogueBox/Overlay/DialoguePanel")
 	var tutorial_prompt: PanelContainer = job.get_node("TutorialLayer/Overlay/TutorialPrompt")
 	var message: RichTextLabel = job.get_node("DialogueBox/Overlay/DialoguePanel/Content/Message")
 	var coin_icon: TextureRect = job.get_node("Hud/Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Coins/Icon")
 	var gem_icon: TextureRect = job.get_node("Hud/Layout/SafeMargin/Columns/LeftStack/CurrencyPanel/CurrencyContent/Gems/Icon")
-	var settings_button: Button = job.get_node("Hud/Layout/SafeMargin/SettingsButton")
-	var settings_panel: PanelContainer = job.get_node("Hud/Layout/SettingsPanel")
-	var close_button: Button = job.get_node("Hud/Layout/SettingsPanel/CloseButton")
+	var settings_button: Button = job.get_node("Hud/Layout/SafeMargin/Columns/RightStack/TopRightButtons/SettingsButton")
+	var settings_layer: CanvasLayer = job.get_node("Hud/SettingsLayer")
+	var settings_panel: PanelContainer = job.get_node("Hud/SettingsLayer/ModalRoot/SettingsPanel")
+	var close_button: Button = job.get_node("Hud/SettingsLayer/ModalRoot/SettingsPanel/CloseButton")
 	var panel_style := job.theme.get_stylebox("panel", "PanelContainer") as StyleBoxTexture
 	var dumpster_size := DUMPSTER_TEXTURE_SIZE * DUMPSTER_TEXTURE_SCALE * dumpster.scale
 	var dumpster_bounds := Rect2(dumpster.global_position - dumpster_size * 0.5, dumpster_size)
@@ -102,9 +103,9 @@ func _verify_layout(job: Control, resolution: Vector2i) -> void:
 	_assert_true(job.theme.get_color("font_outline_color", "Button") == Color.BLACK, "Buttons use a black font outline")
 	_assert_true(job.theme.get_color("font_outline_color", "RichTextLabel") == Color.BLACK, "Dialogue text uses a black font outline")
 	settings_button.emit_signal("pressed")
-	_assert_true(settings_panel.visible, "Settings button opens the settings panel")
+	_assert_true(settings_layer.visible and settings_panel.visible, "Settings button opens the settings panel")
 	close_button.emit_signal("pressed")
-	_assert_true(not settings_panel.visible, "Settings close button hides the settings panel")
+	_assert_true(not settings_layer.visible, "Settings close button hides the settings panel")
 	_assert_string_equal(coin_icon.texture.resource_path, "res://assets/art/ui/game_gui/coin_icon.png", "Coin HUD uses the new GUI icon")
 	_assert_string_equal(gem_icon.texture.resource_path, "res://assets/art/ui/game_gui/gem_icon.png", "Gem HUD uses the new GUI icon")
 
@@ -114,7 +115,7 @@ func _verify_intro_and_tutorial(job: Control) -> void:
 	var message: RichTextLabel = job.get_node("DialogueBox/Overlay/DialoguePanel/Content/Message")
 	var indicator: Label = job.get_node("DialogueBox/Overlay/DialoguePanel/Content/ContinueIndicator")
 	var currency_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/LeftStack/CurrencyPanel")
-	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/UpgradePanel")
+	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/RightStack/UpgradePanel")
 	var tutorial_prompt: PanelContainer = job.get_node("TutorialLayer/Overlay/TutorialPrompt")
 	var bag: Area2D = job.get_node("World/TrashBag")
 
@@ -190,7 +191,7 @@ func _verify_failure_paths(job: Control) -> void:
 	await _perform_invalid_drop(job, Vector2(760.0, 120.0))
 	_assert_equal(GameState.money, money_before, "Release outside the dumpster awards no money")
 
-	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/UpgradePanel")
+	var upgrade_panel: PanelContainer = job.get_node("Hud/Layout/SafeMargin/Columns/RightStack/UpgradePanel")
 	await _perform_invalid_drop(job, upgrade_panel.get_global_rect().get_center())
 	_assert_equal(GameState.money, money_before, "Release on the HUD awards no money")
 
