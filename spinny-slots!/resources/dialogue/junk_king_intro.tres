@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue_data.gd" id="1_dialogue"]
+
+[resource]
+script = ExtResource("1_dialogue")
+lines = Array[String](["Dang! You are really getting somewhere with the slot machines...", "I, the [color=#ffe638]JUNK KING[/color], challenge you to a slot machine battle!", "I'll be waiting for you..."])

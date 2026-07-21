@@ -1,0 +1,143 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/battle_contestant_panel.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/main_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/reel_strip.tscn" id="3_reels"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.16, 0.66, 0.96, 0.85)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="BattleContestantPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(350, 0)
+theme = ExtResource("2_theme")
+theme_override_styles/panel = SubResource("StyleBox_panel")
+script = ExtResource("1_script")
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="HBoxContainer" parent="Layout"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AvatarFrame" type="Control" parent="Layout/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Avatar" type="TextureRect" parent="Layout/Header/AvatarFrame"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="AvatarFallback" type="Label" parent="Layout/Header/AvatarFrame"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.22, 1)
+theme_override_font_sizes/font_size = 28
+text = "YOU"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Identity" type="VBoxContainer" parent="Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ContestantName" type="Label" parent="Layout/Header/Identity"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 29
+text = "CONTESTANT"
+
+[node name="TurnMarker" type="Label" parent="Layout/Header/Identity"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 17
+text = "YOUR TURN"
+
+[node name="TotalLabel" type="Label" parent="Layout/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.2, 1)
+theme_override_font_sizes/font_size = 36
+text = "$0"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="UpgradeSummary" type="Label" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.88, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "UPGRADES: Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="PowerUpRow" type="HBoxContainer" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 62)
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="MachineName" type="Label" parent="Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Waiting for machine..."
+horizontal_alignment = 1
+
+[node name="CabinetArt" type="TextureRect" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 270)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ReelStrip" parent="Layout/CabinetArt" instance=ExtResource("3_reels")]
+unique_name_in_owner = true
+
+[node name="ResultLabel" type="Label" parent="Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Waiting..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2

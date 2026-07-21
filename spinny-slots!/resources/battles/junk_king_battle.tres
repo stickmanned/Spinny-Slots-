@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="JunkKingBattleConfig" load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/junk_king_battle_config.gd" id="1_config"]
+[ext_resource type="Script" path="res://scripts/machine_definition.gd" id="2_machine_script"]
+[ext_resource type="Script" path="res://scripts/power_up_definition.gd" id="3_power_script"]
+[ext_resource type="Resource" path="res://resources/machines/cardboard_cash.tres" id="4_cardboard"]
+[ext_resource type="Resource" path="res://resources/machines/can_crusher.tres" id="5_crusher"]
+[ext_resource type="Resource" path="res://resources/machines/magnet_machine.tres" id="6_magnet"]
+[ext_resource type="Resource" path="res://resources/powerups/luck_booster.tres" id="7_luck"]
+[ext_resource type="Resource" path="res://resources/powerups/payout_doubler.tres" id="8_doubler"]
+[ext_resource type="Resource" path="res://resources/powerups/overcharge.tres" id="9_overcharge"]
+[ext_resource type="Resource" path="res://resources/powerups/final_surge.tres" id="10_surge"]
+[ext_resource type="Resource" path="res://resources/powerups/interference_shield.tres" id="11_shield"]
+[ext_resource type="Resource" path="res://resources/powerups/odds_disruptor.tres" id="12_disruptor"]
+[ext_resource type="Resource" path="res://resources/powerups/payout_siphon.tres" id="13_siphon"]
+[ext_resource type="Resource" path="res://resources/powerups/scrap_reroll.tres" id="14_reroll"]
+[ext_resource type="Resource" path="res://resources/powerups/triple_welder.tres" id="15_welder"]
+[ext_resource type="Resource" path="res://resources/powerups/mixed_load_bonus.tres" id="16_mixed"]
+[ext_resource type="Resource" path="res://resources/upgrades/luck.tres" id="17_upgrade_luck"]
+[ext_resource type="Resource" path="res://resources/upgrades/coin_multiplier.tres" id="18_upgrade_coin"]
+[ext_resource type="Resource" path="res://resources/upgrades/spin_speed.tres" id="19_upgrade_speed"]
+
+[resource]
+script = ExtResource("1_config")
+regulation_rounds = 10
+loadout_size = 3
+base_machine_appearances = 3
+extra_machine_appearances = 1
+score_cap = 2147483647
+machines = Array[ExtResource("2_machine_script")]([ExtResource("4_cardboard"), ExtResource("5_crusher"), ExtResource("6_magnet")])
+junkyard_upgrades = Array[Resource]([ExtResource("17_upgrade_luck"), ExtResource("18_upgrade_coin"), ExtResource("19_upgrade_speed")])
+power_ups = Array[ExtResource("3_power_script")]([ExtResource("7_luck"), ExtResource("8_doubler"), ExtResource("9_overcharge"), ExtResource("10_surge"), ExtResource("11_shield"), ExtResource("12_disruptor"), ExtResource("13_siphon"), ExtResource("14_reroll"), ExtResource("15_welder"), ExtResource("16_mixed")])
+boss_loadout = Array[ExtResource("3_power_script")]([ExtResource("12_disruptor"), ExtResource("13_siphon"), ExtResource("10_surge")])
+boss_loadout_visible = true
+odds_disruptor_round = 4
+payout_siphon_round = 8

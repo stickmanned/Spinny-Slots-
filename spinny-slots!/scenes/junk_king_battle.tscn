@@ -1,0 +1,347 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/junk_king_battle.gd" id="1_script"]
+[ext_resource type="Theme" path="res://resources/ui/main_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://assets/art/junkyard/junkyard_background.png" id="3_background"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle_contestant_panel.tscn" id="4_contestant"]
+[ext_resource type="PackedScene" path="res://scenes/ui/power_up_selection_panel.tscn" id="5_selection"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="6_dialogue"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_top"]
+content_margin_left = 34.0
+content_margin_top = 8.0
+content_margin_right = 34.0
+content_margin_bottom = 8.0
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.16, 0.66, 0.96, 0.85)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_shared"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.16, 0.66, 0.96, 0.85)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="JunkKingBattle" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.34, 0.34, 0.4, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_background")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ReadabilityShade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.005, 0.01, 0.025, 0.48)
+
+[node name="SafeMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="MainLayout" type="VBoxContainer" parent="SafeMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TopBar" type="PanelContainer" parent="SafeMargin/MainLayout"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBox_top")
+
+[node name="StatusRow" type="HBoxContainer" parent="SafeMargin/MainLayout/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="RoundLabel" type="Label" parent="SafeMargin/MainLayout/TopBar/StatusRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "Round 1 / 10"
+vertical_alignment = 1
+
+[node name="TurnLabel" type="Label" parent="SafeMargin/MainLayout/TopBar/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "CHOOSE YOUR POWER-UPS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ActiveMachineLabel" type="Label" parent="SafeMargin/MainLayout/TopBar/StatusRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.48, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Round Machine: Waiting..."
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Arena" type="HBoxContainer" parent="SafeMargin/MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="BossPanel" parent="SafeMargin/MainLayout/Arena" instance=ExtResource("4_contestant")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SharedPanel" type="PanelContainer" parent="SafeMargin/MainLayout/Arena"]
+custom_minimum_size = Vector2(310, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBox_shared")
+
+[node name="SharedLayout" type="VBoxContainer" parent="SafeMargin/MainLayout/Arena/SharedPanel"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="BattleTitle" type="Label" parent="SafeMargin/MainLayout/Arena/SharedPanel/SharedLayout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 26
+text = "JUNK KING CHALLENGE"
+horizontal_alignment = 1
+
+[node name="ActiveEffectLabel" type="Label" parent="SafeMargin/MainLayout/Arena/SharedPanel/SharedLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Power-up effects and machine changes appear here."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="LogTitle" type="Label" parent="SafeMargin/MainLayout/Arena/SharedPanel/SharedLayout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = "BATTLE LOG"
+horizontal_alignment = 1
+
+[node name="BattleLog" type="RichTextLabel" parent="SafeMargin/MainLayout/Arena/SharedPanel/SharedLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/line_separation = 5
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/normal_font_size = 15
+bbcode_enabled = true
+text = "Choose three power-ups to begin."
+scroll_active = true
+scroll_following = true
+autowrap_mode = 2
+
+[node name="SpinButton" type="Button" parent="SafeMargin/MainLayout/Arena/SharedPanel/SharedLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+disabled = true
+theme_override_font_sizes/font_size = 30
+text = "SPIN"
+
+[node name="PlayerPanel" parent="SafeMargin/MainLayout/Arena" instance=ExtResource("4_contestant")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FooterLabel" type="Label" parent="SafeMargin/MainLayout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Player spins: 0 / 10  •  Junk King spins: 0 / 10"
+horizontal_alignment = 1
+
+[node name="SelectionLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 50
+
+[node name="SelectionRoot" type="Control" parent="SelectionLayer"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="SelectionLayer/SelectionRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.005, 0.01, 0.025, 0.82)
+
+[node name="PowerUpSelectionPanel" parent="SelectionLayer/SelectionRoot" instance=ExtResource("5_selection")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -560.0
+offset_top = -340.0
+offset_right = 560.0
+offset_bottom = 340.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OutcomeLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 46
+visible = false
+
+[node name="OutcomeRoot" type="Control" parent="OutcomeLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="Dim" type="ColorRect" parent="OutcomeLayer/OutcomeRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.005, 0.01, 0.025, 0.76)
+
+[node name="OutcomePanel" type="PanelContainer" parent="OutcomeLayer/OutcomeRoot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(650, 390)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -325.0
+offset_top = -195.0
+offset_right = 325.0
+offset_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Layout" type="VBoxContainer" parent="OutcomeLayer/OutcomeRoot/OutcomePanel"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 18
+
+[node name="OutcomeTitle" type="Label" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 38
+text = "FINAL AMOUNTS"
+horizontal_alignment = 1
+
+[node name="OutcomeTotals" type="Label" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "YOU: $0\nJUNK KING: $0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OutcomeMessage" type="Label" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Both amounts are final."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="OutcomeButtons" type="HBoxContainer" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="SecondaryOutcomeButton" type="Button" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout/OutcomeButtons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(250, 62)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "RETURN TO JUNKYARD"
+
+[node name="PrimaryOutcomeButton" type="Button" parent="OutcomeLayer/OutcomeRoot/OutcomePanel/Layout/OutcomeButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 62)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "VIEW RESULT"
+
+[node name="DialogueBox" parent="." instance=ExtResource("6_dialogue")]
+unique_name_in_owner = true
