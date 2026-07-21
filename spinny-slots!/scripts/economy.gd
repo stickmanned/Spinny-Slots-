@@ -55,6 +55,8 @@ func purchase_ticket(machine: MachineDefinition) -> bool:
 
 
 func get_symbol_weight_total(machine: MachineDefinition) -> float:
+	if machine == null:
+		return 0.0
 	var total := 0.0
 	for symbol in machine.symbols:
 		total += maxf(symbol.weight, 0.0)
@@ -62,17 +64,31 @@ func get_symbol_weight_total(machine: MachineDefinition) -> float:
 
 
 func get_effective_symbol_weights(machine: MachineDefinition) -> Dictionary:
+	return calculate_effective_symbol_weights(machine, get_upgrade_multiplier(&"luck"))
+
+
+## Pure weight calculation for simulations and isolated battle scores. The
+## supplied multiplier affects every symbol except the machine's most common
+## symbol while preserving the machine's configured total weight and common
+## symbol floor. This method does not read or mutate GameState or the Economy
+## RNG.
+func calculate_effective_symbol_weights(
+	machine: MachineDefinition,
+	non_common_weight_multiplier: float = 1.0
+) -> Dictionary:
+	if machine == null or machine.symbols.is_empty():
+		return {}
 	var total := get_symbol_weight_total(machine)
-	if machine == null or total <= 0.0:
+	if total <= 0.0:
 		return {}
 	var common := _get_most_common_symbol(machine)
-	var luck_multiplier := get_upgrade_multiplier(&"luck")
+	var safe_multiplier := maxf(non_common_weight_multiplier, 0.0)
 	var weights: Dictionary = {}
 	var boosted_total := 0.0
 	for symbol in machine.symbols:
 		if symbol == common:
 			continue
-		var weight := maxf(symbol.weight, 0.0) * luck_multiplier
+		var weight := maxf(symbol.weight, 0.0) * safe_multiplier
 		weights[symbol.symbol_id] = weight
 		boosted_total += weight
 	var floor_weight := total * COMMON_WEIGHT_FLOOR
@@ -108,14 +124,35 @@ func prepare_machine_spin(machine: MachineDefinition) -> Dictionary:
 		return {}
 	if not GameState.consume_machine_ticket(machine.machine_id):
 		return {}
+	return calculate_machine_spin(
+		machine,
+		_rng,
+		get_upgrade_multiplier(&"luck"),
+		get_upgrade_multiplier(&"coin_multiplier")
+	)
+
+
+## Calculates a complete spin from caller-owned inputs without consuming a
+## ticket, changing the wallet, reading upgrades, or mutating permanent state.
+## The caller owns the supplied RNG, making the result reproducible by seed.
+## Presentation code should animate this finished result and only then commit
+## its reward through the appropriate normal- or battle-score path.
+func calculate_machine_spin(
+	machine: MachineDefinition,
+	rng: RandomNumberGenerator,
+	non_common_weight_multiplier: float = 1.0,
+	payout_multiplier: float = 1.0
+) -> Dictionary:
+	if machine == null or machine.symbols.is_empty() or rng == null:
+		return {}
 	var symbols: Array[SlotSymbol] = []
 	var base_total := 0
 	for _reel_index in range(REEL_COUNT):
-		var symbol := roll_symbol(machine)
+		var symbol := roll_symbol_with_rng(machine, rng, non_common_weight_multiplier)
 		symbols.append(symbol)
 		base_total += symbol.payout
 	# Payouts are always rounded down to whole dollars.
-	var payout := floori(base_total * get_upgrade_multiplier(&"coin_multiplier"))
+	var payout := floori(base_total * maxf(payout_multiplier, 0.0))
 	var rarest_symbol := get_rarest_symbol(machine)
 	var rarest_hits := 0
 	if rarest_symbol != null:
@@ -151,11 +188,24 @@ func award_rarest_bonus(machine: MachineDefinition, outcome: Dictionary) -> int:
 
 
 func roll_symbol(machine: MachineDefinition) -> SlotSymbol:
+	return roll_symbol_with_rng(machine, _rng, get_upgrade_multiplier(&"luck"))
+
+
+## Pure symbol roll using a caller-owned RNG and explicit non-common weight
+## multiplier. It deliberately mirrors roll_symbol's ordering and boundary
+## behavior so existing seeded normal spins remain unchanged.
+func roll_symbol_with_rng(
+	machine: MachineDefinition,
+	rng: RandomNumberGenerator,
+	non_common_weight_multiplier: float = 1.0
+) -> SlotSymbol:
+	if machine == null or machine.symbols.is_empty() or rng == null:
+		return null
 	var total := get_symbol_weight_total(machine)
 	if total <= 0.0:
 		return machine.symbols[0]
-	var weights := get_effective_symbol_weights(machine)
-	var roll := _rng.randf() * total
+	var weights := calculate_effective_symbol_weights(machine, non_common_weight_multiplier)
+	var roll := rng.randf() * total
 	var cumulative := 0.0
 	for symbol in machine.symbols:
 		cumulative += float(weights.get(symbol.symbol_id, 0.0))

@@ -6,7 +6,7 @@
 
 
 [node name="DialogueBox" type="CanvasLayer"]
-layer = 20
+layer = 30
 script = ExtResource("1_script")
 
 [node name="Overlay" type="Control" parent="."]

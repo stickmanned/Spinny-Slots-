@@ -245,12 +245,12 @@ Auto Spinner must support:
 - The player and boss each receive 10 spins.
 - Both begin with a separate battle score of $0.
 - Battle spins do not spend the player's banked money.
-- The player selects a machine and gadget loadout before beginning.
+- The player selects a three-power-up loadout; a balanced randomized schedule rotates through all three Junkyard machines.
 - Player and boss statistics are displayed before the battle.
 - Highest total payout after 10 spins wins.
 - A tie triggers one sudden-death spin for each competitor.
 - Winning grants the prize purse and unlocks the next area.
-- Losing discards only the player's battle score; banked money and permanent progression remain intact.
+- Losing resets the wallet to the protected $30 recovery floor; permanent unlocks, upgrades, tickets, and story progression remain intact.
 - The boss can be challenged again.
 
 ### Player agency
@@ -263,7 +263,7 @@ Boss outcomes cannot depend entirely on passive randomness. During the battle, t
 
 Boss odds and special abilities are fixed and testable. The game does not secretly improve the boss because the player is ahead.
 
-### Junkyard boss: the rich kid
+### Junkyard boss: the Junk King
 
 - Uses an expensive polished machine that contrasts with the junkyard.
 - Taunts the player early in the battle.

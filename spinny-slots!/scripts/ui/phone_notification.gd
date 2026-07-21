@@ -19,6 +19,8 @@ func _ready() -> void:
 	phone_button.pressed.connect(_activate)
 	phone_button.visible = false
 	phone_button.focus_mode = Control.FOCUS_ALL
+	phone_button.resized.connect(_center_phone_pivot)
+	_center_phone_pivot()
 
 
 func show_notification(phone_texture: Texture2D, reduced_motion: bool, animate_pop: bool = true) -> void:
@@ -32,9 +34,18 @@ func show_notification(phone_texture: Texture2D, reduced_motion: bool, animate_p
 	badge.visible = true
 	badge.modulate.a = 1.0
 	badge.scale = Vector2.ONE
+	_center_phone_pivot()
 	if not animate_pop:
 		phone_button.scale = Vector2.ONE
 		_start_attention()
+		return
+	if _reduced_motion:
+		phone_button.scale = Vector2.ONE
+		badge.modulate.a = 0.0
+		_pop_tween = create_tween()
+		_pop_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		_pop_tween.tween_property(badge, "modulate:a", 1.0, POP_SETTLE_DURATION)
+		_pop_tween.tween_callback(_start_attention)
 		return
 
 	phone_button.scale = Vector2.ZERO
@@ -95,7 +106,6 @@ func _activate() -> void:
 	phone_button.rotation = 0.0
 	activated.emit()
 
-
 func _start_attention() -> void:
 	if not phone_button.visible:
 		return
@@ -121,3 +131,7 @@ func _stop_tweens() -> void:
 		_pop_tween.kill()
 	if _attention_tween and _attention_tween.is_valid():
 		_attention_tween.kill()
+
+
+func _center_phone_pivot() -> void:
+	phone_button.pivot_offset = phone_button.size * 0.5

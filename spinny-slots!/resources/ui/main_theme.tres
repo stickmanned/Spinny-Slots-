@@ -1,62 +1,62 @@
-[gd_resource type="Theme" format=3 uid="uid://cc06geaag4tw5"]
+[gd_resource type="Theme" load_steps=11 format=3 uid="uid://cc06geaag4tw5"]
 
 [ext_resource type="FontFile" uid="uid://dsguyk8e6n3us" path="res://assets/fonts/fredoka_one/fredoka_one_regular.ttf" id="1_font"]
-[ext_resource type="Texture2D" uid="uid://cphouqannl72u" path="res://assets/art/ui/game_gui/panel_patterned.png" id="6_disabled"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_disabled"]
-content_margin_left = 18.0
-content_margin_top = 10.0
-content_margin_right = 18.0
-content_margin_bottom = 10.0
-texture = ExtResource("6_disabled")
-texture_margin_left = 20.0
-texture_margin_top = 20.0
-texture_margin_right = 20.0
-texture_margin_bottom = 20.0
-modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
-
-[sub_resource type="StyleBoxTexture" id="StyleBox_hover"]
-content_margin_left = 18.0
-content_margin_top = 10.0
-content_margin_right = 18.0
-content_margin_bottom = 10.0
-texture = ExtResource("6_disabled")
-texture_margin_left = 20.0
-texture_margin_top = 20.0
-texture_margin_right = 20.0
-texture_margin_bottom = 20.0
-modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+[ext_resource type="Texture2D" uid="uid://cphouqannl72u" path="res://assets/art/ui/game_gui/panel_patterned.png" id="2_panel"]
+[ext_resource type="Texture2D" uid="uid://b015xyyxhcl2e" path="res://assets/art/ui/game_gui/button_normal.png" id="3_button_normal"]
+[ext_resource type="Texture2D" uid="uid://cos4v6ufj1xl7" path="res://assets/art/ui/game_gui/button_hover.png" id="4_button_hover"]
+[ext_resource type="Texture2D" uid="uid://b7q6mgtsjnw58" path="res://assets/art/ui/game_gui/button_pressed.png" id="5_button_pressed"]
+[ext_resource type="Texture2D" uid="uid://cquds55la8l0s" path="res://assets/art/ui/game_gui/button_disabled.png" id="6_button_disabled"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBox_normal"]
 content_margin_left = 18.0
 content_margin_top = 10.0
 content_margin_right = 18.0
 content_margin_bottom = 10.0
-texture = ExtResource("6_disabled")
+texture = ExtResource("3_button_normal")
 texture_margin_left = 20.0
 texture_margin_top = 20.0
 texture_margin_right = 20.0
 texture_margin_bottom = 20.0
-modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+texture = ExtResource("4_button_hover")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBox_pressed"]
 content_margin_left = 18.0
 content_margin_top = 12.0
 content_margin_right = 18.0
 content_margin_bottom = 8.0
-texture = ExtResource("6_disabled")
+texture = ExtResource("5_button_pressed")
 texture_margin_left = 20.0
 texture_margin_top = 20.0
 texture_margin_right = 20.0
 texture_margin_bottom = 20.0
-modulate_color = Color(0.231373, 0.694118, 0.988235, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_disabled"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+texture = ExtResource("6_button_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBox_panel"]
 content_margin_left = 22.0
 content_margin_top = 16.0
 content_margin_right = 22.0
 content_margin_bottom = 16.0
-texture = ExtResource("6_disabled")
+texture = ExtResource("2_panel")
 texture_margin_left = 20.0
 texture_margin_top = 20.0
 texture_margin_right = 20.0

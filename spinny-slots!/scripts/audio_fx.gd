@@ -22,6 +22,7 @@ var _click_player: AudioStreamPlayer
 var _coin_player: AudioStreamPlayer
 var _spin_player: AudioStreamPlayer
 var _burst_layer: CanvasLayer
+var _audio_cleaned_up := false
 
 
 class ClickBurst:
@@ -46,6 +47,7 @@ func _ready() -> void:
 	_burst_layer.layer = 120
 	add_child(_burst_layer)
 	get_tree().node_added.connect(_on_node_added)
+	get_tree().root.tree_exiting.connect(_cleanup_audio)
 	_hook_buttons(get_tree().root)
 	GameState.money_spent.connect(_on_money_spent)
 	GameState.sfx_enabled_changed.connect(_on_sfx_enabled_changed)
@@ -57,19 +59,31 @@ func get_spin_stream_length() -> float:
 
 ## Presentation length of one spin at the current spin-speed upgrade level.
 func get_spin_duration() -> float:
-	return maxf(get_spin_stream_length() / Economy.get_spin_speed_multiplier(), MIN_SPIN_DURATION)
+	return get_spin_duration_for_multiplier(Economy.get_spin_speed_multiplier())
+
+
+func get_spin_duration_for_multiplier(speed_multiplier: float) -> float:
+	return maxf(get_spin_stream_length() / maxf(speed_multiplier, 0.01), MIN_SPIN_DURATION)
 
 
 ## Pitch that makes the spin audio finish exactly in get_spin_duration().
 func get_spin_pitch() -> float:
-	return get_spin_stream_length() / get_spin_duration()
+	return get_spin_pitch_for_multiplier(Economy.get_spin_speed_multiplier())
 
 
-func play_spin() -> void:
-	if not GameState.sfx_enabled:
+func get_spin_pitch_for_multiplier(speed_multiplier: float) -> float:
+	return get_spin_stream_length() / get_spin_duration_for_multiplier(speed_multiplier)
+
+
+func play_spin(speed_multiplier: float = -1.0) -> void:
+	if not GameState.sfx_enabled or DisplayServer.get_name() == "headless":
 		return
 	# play() restarts the shared player, so rapid spins can never overlap.
-	_spin_player.pitch_scale = get_spin_pitch()
+	_spin_player.pitch_scale = (
+		get_spin_pitch()
+		if speed_multiplier < 0.0
+		else get_spin_pitch_for_multiplier(speed_multiplier)
+	)
 	_spin_player.play()
 
 
@@ -78,13 +92,13 @@ func stop_spin() -> void:
 
 
 func play_click() -> void:
-	if not GameState.sfx_enabled:
+	if not GameState.sfx_enabled or DisplayServer.get_name() == "headless":
 		return
 	_click_player.play()
 
 
 func play_coin_drop() -> void:
-	if not GameState.sfx_enabled:
+	if not GameState.sfx_enabled or DisplayServer.get_name() == "headless":
 		return
 	_coin_player.play()
 
@@ -137,3 +151,23 @@ func _on_money_spent(_amount: int) -> void:
 func _on_sfx_enabled_changed(_enabled: bool) -> void:
 	if not _enabled:
 		_spin_player.stop()
+
+
+func _exit_tree() -> void:
+	if get_tree() != null and get_tree().node_added.is_connected(_on_node_added):
+		get_tree().node_added.disconnect(_on_node_added)
+	if GameState.money_spent.is_connected(_on_money_spent):
+		GameState.money_spent.disconnect(_on_money_spent)
+	if GameState.sfx_enabled_changed.is_connected(_on_sfx_enabled_changed):
+		GameState.sfx_enabled_changed.disconnect(_on_sfx_enabled_changed)
+	_cleanup_audio()
+
+
+func _cleanup_audio() -> void:
+	if _audio_cleaned_up:
+		return
+	_audio_cleaned_up = true
+	for player in [_click_player, _coin_player, _spin_player]:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null

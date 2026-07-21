@@ -13,6 +13,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/odds_panel.tscn" id="11_odds"]
 [ext_resource type="Script" path="res://scripts/ui/coin_collection_effect.gd" id="12_coin_effect"]
 [ext_resource type="Script" path="res://scripts/ui/confetti_effect.gd" id="13_confetti_effect"]
+[ext_resource type="PackedScene" path="res://scenes/ui/junk_king_presence.tscn" id="14_junk_king_presence"]
+[ext_resource type="PackedScene" path="res://scenes/ui/junk_king_confirmation.tscn" id="15_junk_king_confirmation"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_spotlight"]
 bg_color = Color(0, 0, 0, 0)
@@ -212,6 +214,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("6_theme")
 
+
 [node name="MachineArea" type="VBoxContainer" parent="SelectorLayer/Overlay" unique_id=2068409350]
 unique_name_in_owner = true
 layout_mode = 1
@@ -273,6 +276,12 @@ layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 4.0
 mouse_filter = 2
+
+[node name="JunkKingLayer" type="CanvasLayer" parent="."]
+layer = 24
+
+[node name="JunkKingPresence" parent="JunkKingLayer" instance=ExtResource("14_junk_king_presence")]
+unique_name_in_owner = true
 
 [node name="PhoneNotification" parent="." unique_id=1126243464 instance=ExtResource("8_phone")]
 unique_name_in_owner = true
@@ -336,6 +345,9 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="DialogueBox" parent="." unique_id=859040184 instance=ExtResource("7_dialogue")]
+
+[node name="JunkKingConfirmation" parent="." instance=ExtResource("15_junk_king_confirmation")]
+unique_name_in_owner = true
 
 [editable path="World/Dumpster"]
 [editable path="World/TrashBag"]

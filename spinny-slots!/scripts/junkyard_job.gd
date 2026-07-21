@@ -9,6 +9,8 @@ signal hud_machine_mode_requested(duration: float)
 signal ticket_purchase_confirmed(machine_id: StringName)
 signal spin_started(machine_id: StringName)
 signal spin_completed(machine_id: StringName, payout: int)
+signal junk_king_challenge_confirmed
+signal map_requested(map_id: String)
 
 enum JobPhase {
 	INTRO,
@@ -18,6 +20,10 @@ enum JobPhase {
 	PHONE_CALL,
 	TICKET_PURCHASE,
 	MACHINE_SELECTOR,
+	JUNK_KING_PHONE_AVAILABLE,
+	JUNK_KING_PHONE_CALL,
+	JUNK_KING_ARRIVAL,
+	JUNK_KING_CONFIRMATION,
 }
 
 const BASE_VIEWPORT_HEIGHT := 720.0
@@ -36,6 +42,7 @@ const CALL_FADE_OUT_DURATION := 0.22
 const MACHINE_MODE_FADE_DURATION := 0.3
 const MIN_REEL_DURATION := 0.3
 const LEFT_PANEL_GAP := 16.0
+const JUNK_KING_ARRIVAL_FALLBACK_SECONDS := 1.35
 const DAY_JOB_INTRO: Resource = preload("res://resources/dialogue/day_job_intro.tres")
 const JUNKYARD_PROGRESSION: JunkyardProgressionConfig = preload("res://resources/story/junkyard_progression.tres")
 
@@ -69,6 +76,10 @@ const JUNKYARD_PROGRESSION: JunkyardProgressionConfig = preload("res://resources
 @onready var payout_label: Label = %PayoutLabel
 @onready var coin_collection_effect: CoinCollectionEffect = %CoinCollectionEffect
 @onready var confetti_effect: ConfettiEffect = %ConfettiEffect
+@onready var junk_king_presence: JunkKingPresence = %JunkKingPresence
+@onready var junk_king_confirmation: CanvasLayer = %JunkKingConfirmation
+@onready var machine_cabinet_art: Control = machine_selector.get_node("%CabinetArt") as Control
+@onready var machine_left_arrow: Control = machine_selector.get_node("%LeftArrow") as Control
 
 var _is_dragging := false
 var _interaction_locked := false
@@ -103,6 +114,11 @@ func _ready() -> void:
 	hud_controls_enabled_requested.connect(Callable(hud, "set_controls_enabled"))
 	hud_machine_mode_requested.connect(Callable(hud, "enter_machine_mode"))
 	phone_notification.connect("activated", _on_phone_activated)
+	junk_king_presence.activated.connect(_on_junk_king_activated)
+	junk_king_presence.arrival_completed.connect(_on_junk_king_arrival_completed)
+	junk_king_confirmation.connect("accepted", _on_junk_king_challenge_accepted)
+	junk_king_confirmation.connect("declined", _on_junk_king_challenge_declined)
+	hud.map_requested.connect(func(id: String): map_requested.emit(id))
 	machine_ticket_shop.connect("purchase_requested", _on_ticket_purchase_requested)
 	machine_ticket_shop.connect("machine_selected", _on_ticket_machine_selected)
 	machine_selector.connect("selection_changed", _on_machine_selection_changed)
@@ -126,6 +142,8 @@ func _ready() -> void:
 		machine_ticket_shop.call("set_extension_mode", true)
 	machine_selector.call("configure", JUNKYARD_PROGRESSION.machines, GameState.selected_machine_id)
 	machine_selector.call("set_select_button_visible", false)
+	junk_king_presence.configure_layout(left_column, machine_cabinet_art, machine_left_arrow)
+	junk_king_presence.hide_presence()
 	_layout_world()
 	_queue_left_column_layout()
 	_start_opening_sequence()
@@ -325,6 +343,8 @@ func _on_dialogue_finished() -> void:
 			_enter_tutorial()
 		JobPhase.PHONE_CALL:
 			_end_phone_call()
+		JobPhase.JUNK_KING_PHONE_CALL:
+			_end_junk_king_phone_call()
 
 
 func _on_bag_deposited(_payout: int) -> void:
@@ -371,9 +391,11 @@ func _show_phone_notification(animate_pop: bool) -> void:
 
 
 func _on_phone_activated() -> void:
-	if _phase != JobPhase.PHONE_AVAILABLE:
-		return
-	_begin_phone_call()
+	match _phase:
+		JobPhase.PHONE_AVAILABLE:
+			_begin_phone_call()
+		JobPhase.JUNK_KING_PHONE_AVAILABLE:
+			_begin_junk_king_phone_call()
 
 
 func _begin_phone_call() -> void:
@@ -420,6 +442,99 @@ func _finish_phone_call() -> void:
 	hud_controls_enabled_requested.emit(true)
 	_drag_enabled = true
 	_enter_ticket_purchase()
+
+
+func _show_junk_king_phone_notification(animate_pop: bool) -> void:
+	if GameState.junk_king_intro_completed or GameState.junk_king_defeated:
+		return
+	_phase = JobPhase.JUNK_KING_PHONE_AVAILABLE
+	_drag_enabled = false
+	_cancel_active_drag()
+	junk_king_presence.hide_presence()
+	hud_controls_enabled_requested.emit(false)
+	_refresh_machine_mode()
+	phone_notification.call(
+		"show_notification",
+		JUNKYARD_PROGRESSION.phone_texture,
+		GameState.reduced_motion,
+		animate_pop
+	)
+
+
+func _begin_junk_king_phone_call() -> void:
+	if GameState.junk_king_intro_completed or GameState.junk_king_defeated:
+		return
+	_phase = JobPhase.JUNK_KING_PHONE_CALL
+	phone_notification.call("hide_notification")
+	_drag_enabled = false
+	_cancel_active_drag()
+	hud_controls_enabled_requested.emit(false)
+	purchase_layer.visible = false
+	# The machine list is persistent progression UI. Keep it visible behind the
+	# higher-layer boss dialogue so the call never dismantles the selector.
+	ticket_layer.visible = true
+	call_dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dialogue_box.call(
+		"use_phone_call_layout",
+		JUNKYARD_PROGRESSION.junk_king_name,
+		JUNKYARD_PROGRESSION.junk_king_portrait
+	)
+	dialogue_box.call("set_input_debounce", 0.16)
+	call_dim.color.a = 0.0
+	if _call_tween and _call_tween.is_valid():
+		_call_tween.kill()
+	_call_tween = create_tween()
+	_call_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_call_tween.tween_property(call_dim, "color:a", CALL_DIM_ALPHA, CALL_DIM_DURATION)
+	_call_tween.tween_callback(func() -> void:
+		if _phase == JobPhase.JUNK_KING_PHONE_CALL:
+			dialogue_box.call("play", JUNKYARD_PROGRESSION.junk_king_intro_dialogue.lines)
+	)
+
+
+func _end_junk_king_phone_call() -> void:
+	dialogue_box.call("fade_out", CALL_FADE_OUT_DURATION)
+	if _call_tween and _call_tween.is_valid():
+		_call_tween.kill()
+	_call_tween = create_tween()
+	_call_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_call_tween.tween_property(call_dim, "color:a", 0.0, CALL_DIM_DURATION)
+	_call_tween.tween_callback(_finish_junk_king_phone_call)
+
+
+func _finish_junk_king_phone_call() -> void:
+	if GameState.junk_king_intro_completed or GameState.junk_king_defeated:
+		_show_machine_selector(false)
+		return
+	_phase = JobPhase.JUNK_KING_ARRIVAL
+	call_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dialogue_box.call("use_standard_layout")
+	phone_notification.call("show_idle", JUNKYARD_PROGRESSION.phone_texture)
+	ticket_layer.visible = true
+	selector_layer.visible = true
+	machine_mode_overlay.modulate.a = 1.0
+	junk_king_presence.show_arrival(GameState.reduced_motion, true)
+	# The presence emits arrival_completed. This timer is a logic fallback so a
+	# presentation interruption can never strand the save in a locked cutscene.
+	get_tree().create_timer(JUNK_KING_ARRIVAL_FALLBACK_SECONDS).timeout.connect(
+		_on_junk_king_arrival_fallback
+	)
+
+
+func _on_junk_king_arrival_fallback() -> void:
+	if _phase == JobPhase.JUNK_KING_ARRIVAL:
+		_on_junk_king_arrival_completed()
+
+
+func _on_junk_king_arrival_completed() -> void:
+	if _phase != JobPhase.JUNK_KING_ARRIVAL:
+		return
+	GameState.mark_junk_king_intro_completed()
+	SaveManager.flush()
+	_phase = JobPhase.MACHINE_SELECTOR
+	hud_controls_enabled_requested.emit(true)
+	junk_king_presence.set_interactable(true)
+	_refresh_machine_mode()
 
 
 func _enter_ticket_purchase() -> void:
@@ -481,13 +596,27 @@ func _stop_purchase_highlight() -> void:
 func _on_ticket_purchase_requested(machine: MachineDefinition) -> void:
 	if machine == null or _phase not in [JobPhase.TICKET_PURCHASE, JobPhase.MACHINE_SELECTOR]:
 		return
+	var was_unlocked := GameState.is_machine_unlocked(machine.machine_id)
 	if not Economy.purchase_ticket(machine):
 		machine_ticket_shop.call("refresh")
 		return
+	var should_trigger_junk_king := (
+		machine.machine_id == JUNKYARD_PROGRESSION.junk_king_machine_id
+		and not was_unlocked
+		and not GameState.junk_king_intro_triggered
+		and not GameState.junk_king_defeated
+	)
+	if should_trigger_junk_king:
+		# Persist the safe post-purchase checkpoint before presentation begins.
+		# Reloading an interrupted intro resumes the call without buying again.
+		GameState.mark_junk_king_intro_triggered()
+		SaveManager.flush()
 	if _phase == JobPhase.MACHINE_SELECTOR:
 		ticket_purchase_confirmed.emit(machine.machine_id)
 		machine_ticket_shop.call("refresh")
 		_refresh_machine_mode()
+		if should_trigger_junk_king:
+			_show_junk_king_phone_notification(true)
 		return
 	GameState.mark_ticket_purchase_tutorial_completed()
 	GameState.selected_machine_id = machine.machine_id
@@ -530,12 +659,65 @@ func _show_machine_selector(animate_transition: bool = true, animate_ticket_reve
 	_queue_left_column_layout()
 	_refresh_machine_presentation()
 	_refresh_machine_mode()
+	_refresh_progression_presence()
 	if animate_transition:
 		if _machine_mode_tween and _machine_mode_tween.is_valid():
 			_machine_mode_tween.kill()
 		_machine_mode_tween = create_tween()
 		_machine_mode_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		_machine_mode_tween.tween_property(machine_mode_overlay, "modulate:a", 1.0, MACHINE_MODE_FADE_DURATION)
+
+
+func _refresh_progression_presence() -> void:
+	if GameState.junk_king_defeated:
+		junk_king_presence.hide_presence()
+		return
+	if GameState.junk_king_intro_triggered and not GameState.junk_king_intro_completed:
+		_show_junk_king_phone_notification(false)
+		return
+	if GameState.junk_king_available:
+		junk_king_presence.show_idle(GameState.reduced_motion)
+	else:
+		junk_king_presence.hide_presence()
+
+
+func _on_junk_king_activated() -> void:
+	if (
+		_phase != JobPhase.MACHINE_SELECTOR
+		or not GameState.junk_king_available
+		or GameState.junk_king_defeated
+		or bool(junk_king_confirmation.call("is_open"))
+		or _spin_in_progress
+	):
+		return
+	_phase = JobPhase.JUNK_KING_CONFIRMATION
+	hud_controls_enabled_requested.emit(false)
+	_refresh_machine_mode()
+	if not bool(junk_king_confirmation.call("open")):
+		_phase = JobPhase.MACHINE_SELECTOR
+		hud_controls_enabled_requested.emit(true)
+		junk_king_presence.set_interactable(true)
+		_refresh_machine_mode()
+
+
+func _on_junk_king_challenge_declined() -> void:
+	if _phase != JobPhase.JUNK_KING_CONFIRMATION:
+		return
+	junk_king_confirmation.call("close")
+	_phase = JobPhase.MACHINE_SELECTOR
+	hud_controls_enabled_requested.emit(true)
+	junk_king_presence.set_interactable(true)
+	_refresh_machine_mode()
+
+
+func _on_junk_king_challenge_accepted() -> void:
+	if _phase != JobPhase.JUNK_KING_CONFIRMATION:
+		return
+	junk_king_confirmation.call("close")
+	junk_king_presence.disable_presence()
+	hud_controls_enabled_requested.emit(false)
+	_refresh_machine_mode()
+	junk_king_challenge_confirmed.emit()
 
 
 func _on_machine_selection_changed(machine: MachineDefinition) -> void:
@@ -634,7 +816,7 @@ func _on_spin_pressed() -> void:
 
 func _refresh_machine_mode() -> void:
 	machine_ticket_shop.call("refresh")
-	if _selected_machine == null:
+	if _selected_machine == null or _phase != JobPhase.MACHINE_SELECTOR:
 		spin_button.disabled = true
 		return
 	var ticket_count := GameState.get_machine_ticket_count(_selected_machine.machine_id)

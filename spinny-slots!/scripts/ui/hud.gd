@@ -1,6 +1,11 @@
 extends CanvasLayer
 
 const UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/ui/upgrade_row.tscn")
+const MAP_SELECT_CARD_SCENE: PackedScene = preload("res://scenes/ui/map_select_card.tscn")
+const MapConfig = preload("res://scripts/map_config.gd")
+
+signal map_requested(map_id: String)
+
 
 @onready var coin_value: Label = %CoinValue
 @onready var gem_value: Label = %GemValue
@@ -14,6 +19,10 @@ const UPGRADE_ROW_SCENE: PackedScene = preload("res://scenes/ui/upgrade_row.tscn
 @onready var resolution_dropdown: OptionButton = %ResolutionDropdown
 @onready var reduced_motion_button: Button = %ReducedMotionButton
 @onready var sfx_button: Button = %SfxButton
+@onready var map_button: Button = %MapButton
+@onready var map_select_layer: CanvasLayer = %MapSelectLayer
+@onready var map_cards_container: HBoxContainer = %MapCardsContainer
+@onready var close_map_button: Button = %CloseMapButton
 
 var _currency_tween: Tween
 var _upgrade_tween: Tween
@@ -40,6 +49,12 @@ func _ready() -> void:
 	sfx_button.toggled.connect(_on_sfx_toggled)
 	_update_sfx_text()
 	settings_button.visible = GameState.day_job_tutorial_completed
+	map_button.visible = GameState.metropolis_unlocked
+	map_button.pressed.connect(_on_map_pressed)
+	close_map_button.pressed.connect(_on_close_map_pressed)
+	ButtonHover.attach(map_button)
+	ButtonHover.attach(settings_button)
+	ButtonHover.attach(close_map_button)
 
 	# Populate and select screen resolution options
 	resolution_dropdown.clear()
@@ -73,6 +88,7 @@ func hide_all() -> void:
 	currency_panel.modulate.a = 0.0
 	upgrade_panel.modulate.a = 0.0
 	settings_button.visible = false
+	map_button.visible = false
 
 
 func show_currency(duration: float) -> void:
@@ -88,6 +104,7 @@ func enter_machine_mode(duration: float) -> void:
 	currency_panel.visible = true
 	upgrade_panel.visible = true
 	settings_button.visible = true
+	map_button.visible = GameState.metropolis_unlocked
 	if _currency_tween and _currency_tween.is_valid():
 		_currency_tween.kill()
 	if duration <= 0.0:
@@ -205,10 +222,12 @@ func _update_sfx_text() -> void:
 
 func show_settings_button() -> void:
 	settings_button.visible = true
+	map_button.visible = GameState.metropolis_unlocked
 
 
 func set_controls_enabled(enabled: bool) -> void:
 	settings_button.disabled = not enabled
+	map_button.disabled = not enabled
 	volume_slider.editable = enabled
 	resolution_dropdown.disabled = not enabled
 	close_button.disabled = not enabled
@@ -243,3 +262,53 @@ func _on_resolution_selected(index: int) -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_size(target_size)
 		DisplayServer.window_set_position((screen_size - target_size) / 2)
+
+
+func _on_map_pressed() -> void:
+	map_select_layer.visible = true
+	_populate_map_cards()
+	close_map_button.grab_focus()
+
+
+func _on_close_map_pressed() -> void:
+	map_select_layer.visible = false
+	map_button.grab_focus()
+
+
+func _populate_map_cards() -> void:
+	for child in map_cards_container.get_children():
+		child.queue_free()
+	
+	var current_scene_name = get_tree().current_scene.scene_file_path.get_file().get_basename()
+	var current_map_id = "junkyard" # default
+	if current_scene_name == "metropolis_preview":
+		current_map_id = "metropolis"
+	elif current_scene_name == "junkyard_job":
+		current_map_id = "junkyard"
+	
+	for map_config in MapConfig.get_maps():
+		var card = MAP_SELECT_CARD_SCENE.instantiate()
+		map_cards_container.add_child(card)
+		card.configure(map_config, current_map_id)
+		card.map_selected.connect(_on_map_selected)
+		
+	# Focus the first enabled map card that is unlocked and not current, if any. Otherwise close button has focus
+	for card in map_cards_container.get_children():
+		if card.disabled == false and card.mouse_default_cursor_shape == Control.CURSOR_POINTING_HAND:
+			card.grab_focus()
+			break
+
+
+func _on_map_selected(map_id: String) -> void:
+	map_select_layer.visible = false
+	map_requested.emit(map_id)
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		if map_select_layer.visible:
+			_on_close_map_pressed()
+			get_viewport().set_input_as_handled()
+		elif settings_layer.visible:
+			_on_close_pressed()
+			get_viewport().set_input_as_handled()

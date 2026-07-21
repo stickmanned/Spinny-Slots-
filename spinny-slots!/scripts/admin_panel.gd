@@ -170,6 +170,16 @@ func _build_ui() -> void:
 
 	_add_separator(content)
 
+	# ── Junk King section ──
+	_add_section_label(content, "JUNK KING")
+
+	var junk_king_row := HBoxContainer.new()
+	junk_king_row.add_theme_constant_override("separation", 6)
+	content.add_child(junk_king_row)
+	_add_button(junk_king_row, "Buy Magnet Ticket ($1K)", _buy_magnet_ticket)
+
+	_add_separator(content)
+
 	# ── Upgrades section ──
 	_add_section_label(content, "UPGRADES")
 
@@ -306,12 +316,16 @@ func _complete_all_story() -> void:
 		GameState.unlock_machine(machine.machine_id)
 		if GameState.selected_machine_id == &"":
 			GameState.selected_machine_id = machine.machine_id
+	# A completed pre-boss Junkyard should expose the fight without replaying the
+	# one-time purchase introduction or leaving Magnet owners stranded.
+	GameState.mark_junk_king_available()
 	# Ensure the player has enough money and tickets to actually play.
 	if GameState.money < 100:
 		GameState.money = 100
 	for machine in JUNKYARD_PROGRESSION.machines:
 		if GameState.get_machine_ticket_count(machine.machine_id) < 5:
 			GameState.add_machine_ticket(machine.machine_id, 10)
+	SaveManager.flush()
 	_close_and_reload()
 
 
@@ -323,6 +337,50 @@ func _reset_progress() -> void:
 func _give_tickets(amount: int) -> void:
 	for machine in JUNKYARD_PROGRESSION.machines:
 		GameState.add_machine_ticket(machine.machine_id, amount)
+
+
+func _buy_magnet_ticket() -> void:
+	var machine := _find_junk_king_machine()
+	if machine == null or JUNKYARD_PROGRESSION.machines.is_empty():
+		return
+	# The real ticket shop only ever offers the Magnet ticket after the intro,
+	# first phone call, and ticket-purchase tutorial are all done (see
+	# junkyard_job.gd's _get_ticket_shop_machines gating). Without those flags,
+	# a scene reload lands back in that earlier flow instead of the machine
+	# selector, so the trigger flag gets set but nothing ever checks it and the
+	# encounter silently never appears. Fast-forward those beats first.
+	GameState.day_job_intro_seen = true
+	GameState.day_job_tutorial_completed = true
+	GameState.phone_notification_received = true
+	GameState.phone_call_started = true
+	GameState.phone_call_completed = true
+	GameState.ticket_purchase_tutorial_completed = true
+	var primary_machine: MachineDefinition = JUNKYARD_PROGRESSION.machines[0]
+	GameState.unlock_machine(primary_machine.machine_id)
+	if GameState.selected_machine_id == &"":
+		GameState.selected_machine_id = primary_machine.machine_id
+	# Route through the real purchase path (spends money, unlocks the machine)
+	# so the Junk King intro triggers exactly as it does from the in-game shop,
+	# instead of a debug shortcut that just flips flags.
+	var was_unlocked := GameState.is_machine_unlocked(machine.machine_id)
+	if not Economy.purchase_ticket(machine):
+		return
+	var should_trigger_junk_king := (
+		not was_unlocked
+		and not GameState.junk_king_intro_triggered
+		and not GameState.junk_king_defeated
+	)
+	if should_trigger_junk_king:
+		GameState.mark_junk_king_intro_triggered()
+	SaveManager.flush()
+	_close_and_reload()
+
+
+func _find_junk_king_machine() -> MachineDefinition:
+	for machine in JUNKYARD_PROGRESSION.machines:
+		if machine.machine_id == JUNKYARD_PROGRESSION.junk_king_machine_id:
+			return machine
+	return null
 
 
 func _max_all_upgrades() -> void:

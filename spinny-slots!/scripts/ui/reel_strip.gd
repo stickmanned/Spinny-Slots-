@@ -40,8 +40,18 @@ func set_idle_symbols(icons: Array[Texture2D]) -> void:
 		_icons[index].modulate.a = 1.0
 
 
-func play_spin(result_icons: Array[Texture2D], pool_icons: Array[Texture2D], duration: float) -> void:
+func play_spin(
+	result_icons: Array[Texture2D],
+	pool_icons: Array[Texture2D],
+	duration: float,
+	reduced_motion: bool = false
+) -> void:
 	if result_icons.is_empty():
+		return
+	if reduced_motion:
+		for index in range(_icons.size()):
+			_icons[index].texture = result_icons[index % result_icons.size()]
+			_icons[index].modulate.a = 1.0
 		return
 	if pool_icons.is_empty() or _icons.is_empty():
 		for index in range(_icons.size()):

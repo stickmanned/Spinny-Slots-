@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="JunkyardProgressionConfig" format=3 uid="uid://c6is3hy0q6k4e"]
+[gd_resource type="Resource" script_class="JunkyardProgressionConfig" load_steps=10 format=3 uid="uid://c6is3hy0q6k4e"]
 
 [ext_resource type="Script" uid="uid://doojsttcurv5f" path="res://scripts/machine_definition.gd" id="1_23uqf"]
 [ext_resource type="Script" uid="uid://bb2mlo8p8kx43" path="res://scripts/junkyard_progression_config.gd" id="1_config"]
@@ -8,6 +8,8 @@
 [ext_resource type="Resource" uid="uid://py8y2opqoio1" path="res://resources/machines/cardboard_cash.tres" id="5_machine"]
 [ext_resource type="Resource" path="res://resources/machines/can_crusher.tres" id="6_machine"]
 [ext_resource type="Resource" path="res://resources/machines/magnet_machine.tres" id="7_machine"]
+[ext_resource type="Resource" path="res://resources/dialogue/junk_king_intro.tres" id="8_junk_king_dialogue"]
+[ext_resource type="Texture2D" path="res://resources/symbols/Junk King.png" id="9_junk_king"]
 
 [sub_resource type="AtlasTexture" id="Atlas_phone"]
 atlas = ExtResource("3_phone")
@@ -17,9 +19,20 @@ region = Rect2(710, 480, 610, 990)
 atlas = ExtResource("4_portrait")
 region = Rect2(380, 415, 1220, 1185)
 
+[sub_resource type="AtlasTexture" id="Atlas_junk_king_portrait"]
+atlas = ExtResource("9_junk_king")
+region = Rect2(133, 429, 1354, 1133)
+
+[sub_resource type="AtlasTexture" id="Atlas_junk_king_full"]
+atlas = ExtResource("9_junk_king")
+region = Rect2(133, 429, 1354, 1133)
+
 [resource]
 script = ExtResource("1_config")
 phone_call_dialogue = ExtResource("2_dialogue")
 phone_texture = SubResource("Atlas_phone")
 rich_kid_portrait = SubResource("Atlas_rich_kid")
 machines = Array[ExtResource("1_23uqf")]([ExtResource("5_machine"), ExtResource("6_machine"), ExtResource("7_machine")])
+junk_king_intro_dialogue = ExtResource("8_junk_king_dialogue")
+junk_king_portrait = SubResource("Atlas_junk_king_portrait")
+junk_king_texture = SubResource("Atlas_junk_king_full")

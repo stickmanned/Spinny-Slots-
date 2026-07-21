@@ -5,6 +5,55 @@
 [ext_resource type="Texture2D" uid="uid://7ojsxm6qkwsd" path="res://assets/art/ui/game_gui/coin_icon.png" id="3_coin"]
 [ext_resource type="Texture2D" uid="uid://nlgx1qy2wf8a" path="res://assets/art/ui/game_gui/gem_icon.png" id="4_gem"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/gear_icon.png" id="5_gear"]
+[ext_resource type="Texture2D" path="res://assets/icons/map.png" id="map_icon"]
+[ext_resource type="Texture2D" uid="uid://b015xyyxhcl2e" path="res://assets/art/ui/game_gui/button_normal.png" id="7_btn_normal"]
+[ext_resource type="Texture2D" uid="uid://cos4v6ufj1xl7" path="res://assets/art/ui/game_gui/button_hover.png" id="8_btn_hover"]
+[ext_resource type="Texture2D" uid="uid://b7q6mgtsjnw58" path="res://assets/art/ui/game_gui/button_pressed.png" id="9_btn_pressed"]
+[ext_resource type="Texture2D" uid="uid://cquds55la8l0s" path="res://assets/art/ui/game_gui/button_disabled.png" id="10_btn_disabled"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_icon_normal"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+texture = ExtResource("7_btn_normal")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_icon_hover"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+texture = ExtResource("8_btn_hover")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_icon_pressed"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+texture = ExtResource("9_btn_pressed")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBox_icon_disabled"]
+content_margin_left = 14.0
+content_margin_top = 14.0
+content_margin_right = 14.0
+content_margin_bottom = 14.0
+texture = ExtResource("10_btn_disabled")
+texture_margin_left = 20.0
+texture_margin_top = 20.0
+texture_margin_right = 20.0
+texture_margin_bottom = 20.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_close_normal"]
 bg_color = Color(0.82, 0.13, 0.13, 1)
@@ -27,6 +76,72 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+
+[sub_resource type="StyleBoxEmpty" id="StyleBox_close_focus"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_close_map_normal"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.847059, 0.176471, 0.176471, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 7
+border_color = Color(0.478431, 0.078431, 0.078431, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_close_map_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.945098, 0.286275, 0.286275, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 7
+border_color = Color(0.478431, 0.078431, 0.078431, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_close_map_pressed"]
+content_margin_left = 18.0
+content_margin_top = 13.0
+content_margin_right = 18.0
+content_margin_bottom = 7.0
+bg_color = Color(0.647059, 0.129412, 0.129412, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.478431, 0.078431, 0.078431, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_close_map_disabled"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.847059, 0.176471, 0.176471, 0.5)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 7
+border_color = Color(0.478431, 0.078431, 0.078431, 0.5)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
 
 [node name="Hud" type="CanvasLayer" unique_id=974220878]
 layer = 10
@@ -163,6 +278,21 @@ alignment = 2
 mouse_filter = 2
 theme_override_constants/separation = 10
 
+[node name="MapButton" type="Button" parent="Layout/SafeMargin/Columns/RightStack/TopRightButtons"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+tooltip_text = "Map Select"
+theme_override_styles/normal = SubResource("StyleBox_icon_normal")
+theme_override_styles/hover = SubResource("StyleBox_icon_hover")
+theme_override_styles/pressed = SubResource("StyleBox_icon_pressed")
+theme_override_styles/disabled = SubResource("StyleBox_icon_disabled")
+icon = ExtResource("map_icon")
+expand_icon = true
+icon_alignment = 1
+
 [node name="SettingsButton" type="Button" parent="Layout/SafeMargin/Columns/RightStack/TopRightButtons"]
 unique_name_in_owner = true
 visible = false
@@ -170,7 +300,12 @@ custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 tooltip_text = "Settings"
+theme_override_styles/normal = SubResource("StyleBox_icon_normal")
+theme_override_styles/hover = SubResource("StyleBox_icon_hover")
+theme_override_styles/pressed = SubResource("StyleBox_icon_pressed")
+theme_override_styles/disabled = SubResource("StyleBox_icon_disabled")
 icon = ExtResource("5_gear")
+expand_icon = true
 icon_alignment = 1
 
 [node name="UpgradePanel" type="PanelContainer" parent="Layout/SafeMargin/Columns/RightStack" unique_id=1241166089]
@@ -318,3 +453,76 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_close_normal")
 theme_override_styles/hover = SubResource("StyleBoxFlat_close_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_close_pressed")
 text = "X"
+
+[node name="MapSelectLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 50
+visible = false
+
+[node name="ModalRoot" type="Control" parent="MapSelectLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_theme")
+
+[node name="MapDim" type="ColorRect" parent="MapSelectLayer/ModalRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.015, 0.025, 0.055, 0.72)
+
+[node name="MapPanel" type="PanelContainer" parent="MapSelectLayer/ModalRoot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(940, 470)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -470.0
+offset_top = -235.0
+offset_right = 470.0
+offset_bottom = 235.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(470, 235)
+
+[node name="Content" type="VBoxContainer" parent="MapSelectLayer/ModalRoot/MapPanel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="MapSelectLayer/ModalRoot/MapPanel/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.86, 0.2, 1)
+theme_override_font_sizes/font_size = 34
+text = "MAP SELECT"
+horizontal_alignment = 1
+
+[node name="MapCardsContainer" type="HBoxContainer" parent="MapSelectLayer/ModalRoot/MapPanel/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="CloseMapButton" type="Button" parent="MapSelectLayer/ModalRoot/MapPanel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 62)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+theme_override_styles/focus = SubResource("StyleBox_close_focus")
+theme_override_styles/normal = SubResource("StyleBox_close_map_normal")
+theme_override_styles/hover = SubResource("StyleBox_close_map_hover")
+theme_override_styles/pressed = SubResource("StyleBox_close_map_pressed")
+theme_override_styles/disabled = SubResource("StyleBox_close_map_disabled")
+text = "CLOSE"

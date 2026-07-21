@@ -6,6 +6,7 @@ signal faded_out
 
 @export_range(1.0, 120.0, 1.0) var chars_per_second := 32.0
 @export_range(0.0, 1.0, 0.01) var fade_in_duration := 0.18
+@export_range(0.0, 1.0, 0.01) var input_debounce_seconds := 0.0
 
 @onready var dialogue_panel: PanelContainer = %DialoguePanel
 @onready var message: RichTextLabel = %Message
@@ -22,6 +23,7 @@ var _is_typing := false
 var _finish_emitted := false
 var _fade_tween: Tween
 var _indicator_tween: Tween
+var _last_input_advance_msec := -1
 
 
 func _ready() -> void:
@@ -61,6 +63,12 @@ func _input(event: InputEvent) -> void:
 		)
 
 	if should_advance:
+		var now_msec := Time.get_ticks_msec()
+		var debounce_msec := ceili(input_debounce_seconds * 1000.0)
+		if _last_input_advance_msec >= 0 and now_msec - _last_input_advance_msec < debounce_msec:
+			get_viewport().set_input_as_handled()
+			return
+		_last_input_advance_msec = now_msec
 		advance()
 		get_viewport().set_input_as_handled()
 
@@ -69,6 +77,7 @@ func play(lines: Array[String]) -> void:
 	_stop_active_tweens()
 	_lines = lines.duplicate()
 	_line_index = -1
+	_last_input_advance_msec = -1
 	_finish_emitted = false
 	_is_playing = not _lines.is_empty()
 	dialogue_panel.modulate.a = 0.0
@@ -81,6 +90,11 @@ func play(lines: Array[String]) -> void:
 	_fade_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_fade_tween.tween_property(dialogue_panel, "modulate:a", 1.0, fade_in_duration)
 	_show_next_line()
+
+
+func set_input_debounce(seconds: float) -> void:
+	input_debounce_seconds = clampf(seconds, 0.0, 1.0)
+	_last_input_advance_msec = -1
 
 
 func use_standard_layout() -> void:
