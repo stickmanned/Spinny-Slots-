@@ -1,7 +1,22 @@
-[gd_scene format=3 uid="uid://cmlck0tye5c2q"]
+[gd_scene load_steps=2 format=3 uid="uid://cmlck0tye5c2q"]
 
-[ext_resource type="PackedScene" uid="uid://d1n4hbf523n6y" path="res://scenes/junkyard_job.tscn" id="1_job"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_script"]
 
 [node name="Main" type="Node" unique_id=2104289412]
+script = ExtResource("1_script")
 
-[node name="JunkyardJob" parent="." unique_id=1386137158 instance=ExtResource("1_job")]
+[node name="SceneHost" type="Node" parent="."]
+
+[node name="TransitionLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="Fade" type="ColorRect" parent="TransitionLayer"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.004, 0.008, 0.02, 1)
