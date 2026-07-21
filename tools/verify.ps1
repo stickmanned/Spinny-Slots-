@@ -82,6 +82,12 @@ Invoke-Checked -Executable $godot -Description 'Running the Milestone 3c rarest-
     'res://scenes/dev/milestone_3c_rare_bonus_test.tscn'
 )
 
+Invoke-Checked -Executable $godot -Description 'Running the Junk King battle, progression, save, and encounter integration checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/junk_king_feature_test.tscn'
+)
+
 if ($Export) {
     $buildDirectory = Join-Path $projectRoot 'builds'
     New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null

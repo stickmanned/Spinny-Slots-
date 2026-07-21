@@ -346,14 +346,12 @@ func _assert_phone_layout(job: Control, resolution: Vector2i) -> void:
 	var phone_button: Button = job.get_node("PhoneNotification/Overlay/PhoneButton")
 	_assert_true(bounds.encloses(phone_button.get_global_rect()), "Phone fits at %dx%d" % [resolution.x, resolution.y])
 
-
 func _mouse_press(job: Control, position: Vector2) -> void:
 	var event := InputEventMouseButton.new()
 	event.button_index = MOUSE_BUTTON_LEFT
 	event.pressed = true
 	event.position = position
 	job._input(event)
-
 
 func _click_gui(position: Vector2) -> void:
 	var press := InputEventMouseButton.new()
@@ -367,22 +365,18 @@ func _click_gui(position: Vector2) -> void:
 	Input.parse_input_event(release)
 	await _frames(2)
 
-
 func _frames(count: int) -> void:
 	for _index in range(count):
 		await get_tree().process_frame
 
-
 func _assert_true(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
-
-
+		
 func _assert_equal(actual: Variant, expected: Variant, message: String) -> void:
 	if actual != expected:
 		_failures.append("%s (expected %s, got %s)" % [message, expected, actual])
-
-
+		
 func _assert_float_close(actual: float, expected: float, tolerance: float, message: String) -> void:
 	if absf(actual - expected) > tolerance:
 		_failures.append("%s (expected %.3f, got %.3f)" % [message, expected, actual])
