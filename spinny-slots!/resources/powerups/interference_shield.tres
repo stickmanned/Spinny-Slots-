@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PowerUpDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/power_up_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/powerups/interference_shield.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+power_up_id = &"interference_shield"
+display_name = "Interference Shield"
+description = "Automatically cancels the first incoming Odds Disruptor or Payout Siphon. One charge."
+icon = ExtResource("2_icon")
+effect_kind = 4
+max_uses = 1

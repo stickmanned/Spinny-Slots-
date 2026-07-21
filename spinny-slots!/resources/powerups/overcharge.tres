@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PowerUpDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/power_up_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/powerups/overcharge.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+power_up_id = &"overcharge"
+display_name = "Overcharge"
+description = "Arm before a spin for a seeded 80% chance at 3x payout; the other 20% yields $0. One use."
+icon = ExtResource("2_icon")
+effect_kind = 2
+is_active = true
+max_uses = 1
+payout_multiplier = 3.0
+failure_chance = 0.2

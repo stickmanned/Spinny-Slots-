@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PowerUpDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/power_up_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/powerups/odds_disruptor.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+power_up_id = &"odds_disruptor"
+display_name = "Odds Disruptor"
+description = "Reduces the opponent's non-common symbol weights to 0.75x on their next spin. One use."
+icon = ExtResource("2_icon")
+effect_kind = 5
+is_active = true
+max_uses = 1
+weight_multiplier = 0.75

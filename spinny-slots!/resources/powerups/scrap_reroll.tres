@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PowerUpDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/power_up_definition.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/art/powerups/scrap_reroll.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+power_up_id = &"scrap_reroll"
+display_name = "Scrap Reroll"
+description = "Automatically rerolls the complete outcome once when all three reels land the machine's lowest-value symbol. One charge."
+icon = ExtResource("2_icon")
+effect_kind = 7
+max_uses = 1
