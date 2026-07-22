@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_config.gd" id="1_config"]
+[ext_resource type="Texture2D" path="res://assets/icons/clover.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_config")
+upgrade_id = &"luck"
+display_name = "Luck"
+icon = ExtResource("2_icon")
+base_cost = 1
+cost_growth = 1.4
+max_level = 10
+effect_per_level = 0.15
+cost_fraction_of_ticket = 0.6
+tooltip = "Shifts this machine's odds toward rarer, higher-paying symbols."

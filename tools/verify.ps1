@@ -88,6 +88,12 @@ Invoke-Checked -Executable $godot -Description 'Running the Junk King battle, pr
     'res://scenes/dev/junk_king_feature_test.tscn'
 )
 
+Invoke-Checked -Executable $godot -Description 'Running the Metropolis paytable, weighted RNG, cascade, mechanic, save, and job-scene checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/metropolis_milestone_test.tscn'
+)
+
 if ($Export) {
     $buildDirectory = Join-Path $projectRoot 'builds'
     New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null

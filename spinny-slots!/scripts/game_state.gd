@@ -9,6 +9,9 @@ signal reduced_motion_changed(value: bool)
 signal sfx_enabled_changed(value: bool)
 signal story_progress_changed
 signal machine_tickets_changed(machine_id: StringName, count: int)
+signal machine_mechanic_charges_changed(machine_id: StringName, count: int)
+signal machine_free_rerolls_changed(machine_id: StringName, count: int)
+signal machine_upgrade_levels_changed(machine_id: StringName, upgrade_id: StringName, level: int)
 signal machine_unlocked(machine_id: StringName)
 signal selected_machine_changed(machine_id: StringName)
 
@@ -124,7 +127,15 @@ var selected_machine_id: StringName = &"":
 
 var unlocked_machine_ids: Array[StringName] = []
 var machine_ticket_counts: Dictionary = {}
+## Metropolis-only: banked Hack Charges (Firewall Hacker Terminal) and free
+## Surge reroll tokens (Rideshare Drone Dispatch), both keyed by machine_id.
+## Empty for machines without that mechanic; Junkyard machines never use these.
+var machine_mechanic_charges: Dictionary = {}
+var machine_free_rerolls: Dictionary = {}
 var upgrade_levels: Dictionary = {}
+## Metropolis-only: each machine upgrades independently. Keyed
+## "machine_id::upgrade_id" -> level. Junkyard keeps using upgrade_levels.
+var machine_upgrade_levels: Dictionary = {}
 
 var _resolved_junk_king_battle_tokens: Dictionary = {}
 var _next_junk_king_resolution_id := 0
@@ -151,6 +162,9 @@ func reset_for_new_game() -> void:
 	selected_machine_id = &""
 	unlocked_machine_ids.clear()
 	machine_ticket_counts.clear()
+	machine_mechanic_charges.clear()
+	machine_free_rerolls.clear()
+	machine_upgrade_levels.clear()
 	upgrade_levels.clear()
 	clear_junk_king_resolution_guards()
 	reduced_motion = false
@@ -323,3 +337,61 @@ func consume_machine_ticket(machine_id: StringName) -> bool:
 	machine_ticket_counts[String(machine_id)] = count - 1
 	machine_tickets_changed.emit(machine_id, count - 1)
 	return true
+
+
+func get_machine_mechanic_charges(machine_id: StringName) -> int:
+	return int(machine_mechanic_charges.get(String(machine_id), 0))
+
+
+## Charges are capped by the caller (the machine's MetropolisMechanicConfig
+## defines the cap); GameState just stores whatever count it is given.
+func set_machine_mechanic_charges(machine_id: StringName, count: int) -> void:
+	var clamped := maxi(count, 0)
+	machine_mechanic_charges[String(machine_id)] = clamped
+	machine_mechanic_charges_changed.emit(machine_id, clamped)
+
+
+func add_machine_mechanic_charge(machine_id: StringName, cap: int) -> void:
+	var next_count := mini(get_machine_mechanic_charges(machine_id) + 1, maxi(cap, 0))
+	set_machine_mechanic_charges(machine_id, next_count)
+
+
+func consume_machine_mechanic_charge(machine_id: StringName) -> bool:
+	var count := get_machine_mechanic_charges(machine_id)
+	if count <= 0:
+		return false
+	set_machine_mechanic_charges(machine_id, count - 1)
+	return true
+
+
+func get_machine_free_rerolls(machine_id: StringName) -> int:
+	return int(machine_free_rerolls.get(String(machine_id), 0))
+
+
+func add_machine_free_reroll(machine_id: StringName) -> void:
+	var next_count := get_machine_free_rerolls(machine_id) + 1
+	machine_free_rerolls[String(machine_id)] = next_count
+	machine_free_rerolls_changed.emit(machine_id, next_count)
+
+
+func consume_machine_free_reroll(machine_id: StringName) -> bool:
+	var count := get_machine_free_rerolls(machine_id)
+	if count <= 0:
+		return false
+	machine_free_rerolls[String(machine_id)] = count - 1
+	machine_free_rerolls_changed.emit(machine_id, count - 1)
+	return true
+
+
+func _machine_upgrade_key(machine_id: StringName, upgrade_id: StringName) -> String:
+	return "%s::%s" % [String(machine_id), String(upgrade_id)]
+
+
+func get_machine_upgrade_level(machine_id: StringName, upgrade_id: StringName) -> int:
+	return int(machine_upgrade_levels.get(_machine_upgrade_key(machine_id, upgrade_id), 0))
+
+
+func increment_machine_upgrade_level(machine_id: StringName, upgrade_id: StringName) -> void:
+	var next_level := get_machine_upgrade_level(machine_id, upgrade_id) + 1
+	machine_upgrade_levels[_machine_upgrade_key(machine_id, upgrade_id)] = next_level
+	machine_upgrade_levels_changed.emit(machine_id, upgrade_id, next_level)

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Economy="*res://scripts/economy.gd"
+MetropolisEconomy="*res://scripts/metropolis_economy.gd"
 GameState="*res://scripts/game_state.gd"
 SaveManager="*res://scripts/save_manager.gd"
 AudioFx="*res://scripts/audio_fx.gd"

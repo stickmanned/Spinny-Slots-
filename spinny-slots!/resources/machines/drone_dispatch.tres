@@ -1,0 +1,109 @@
+[gd_resource type="Resource" script_class="MetropolisMachineDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/metropolis_machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://resources/tickets/Drone Dispatch Ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" path="res://resources/machines/Drone Dispatch.png" id="3_cabinet"]
+[ext_resource type="Script" path="res://scripts/metropolis_symbol.gd" id="4_symbol"]
+[ext_resource type="Script" path="res://scripts/metropolis_payout_tier.gd" id="5_tier"]
+[ext_resource type="Script" path="res://scripts/metropolis_mechanic_config.gd" id="6_mechanic"]
+[ext_resource type="Texture2D" path="res://assets/icons/Rideshare Drone Dispatch/taxi.png" id="7_taxi_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Rideshare Drone Dispatch/pin.png" id="8_pin_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Rideshare Drone Dispatch/drone.png" id="9_drone_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Rideshare Drone Dispatch/badge.png" id="10_badge_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Rideshare Drone Dispatch/bolt.png" id="11_bolt_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(20, 20, 984, 984)
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(260, 660, 1480, 680)
+
+[sub_resource type="Resource" id="Symbol_taxi"]
+script = ExtResource("4_symbol")
+symbol_id = &"taxi"
+display_name = "Taxi Light"
+icon = ExtResource("7_taxi_icon")
+tier = 0
+weight = 35.0
+
+[sub_resource type="Resource" id="Symbol_pin"]
+script = ExtResource("4_symbol")
+symbol_id = &"pin"
+display_name = "Map Pin"
+icon = ExtResource("8_pin_icon")
+tier = 0
+weight = 27.0
+
+[sub_resource type="Resource" id="Symbol_drone"]
+script = ExtResource("4_symbol")
+symbol_id = &"drone"
+display_name = "Drone Fleet Icon"
+icon = ExtResource("9_drone_icon")
+tier = 1
+weight = 20.0
+
+[sub_resource type="Resource" id="Symbol_badge"]
+script = ExtResource("4_symbol")
+symbol_id = &"badge"
+display_name = "Passenger Star"
+icon = ExtResource("10_badge_icon")
+tier = 2
+weight = 12.0
+
+[sub_resource type="Resource" id="Symbol_bolt"]
+script = ExtResource("4_symbol")
+symbol_id = &"bolt"
+display_name = "Surge Bolt"
+icon = ExtResource("11_bolt_icon")
+tier = 3
+weight = 6.0
+
+[sub_resource type="Resource" id="Tier_common"]
+script = ExtResource("5_tier")
+tier = 0
+payouts_by_count = {
+"3": 750000
+}
+
+[sub_resource type="Resource" id="Tier_uncommon"]
+script = ExtResource("5_tier")
+tier = 1
+payouts_by_count = {
+"3": 2200000
+}
+
+[sub_resource type="Resource" id="Tier_rare"]
+script = ExtResource("5_tier")
+tier = 2
+payouts_by_count = {
+"3": 6000000
+}
+
+[sub_resource type="Resource" id="Tier_jackpot"]
+script = ExtResource("5_tier")
+tier = 3
+payouts_by_count = {
+"3": 18000000
+}
+
+[sub_resource type="Resource" id="Mechanic_surge"]
+script = ExtResource("6_mechanic")
+kind = 1
+surge_multiplier_sequence = Array[float]([1.0, 1.5, 2.0, 3.0, 5.0])
+surge_reroll_cost = 20
+surge_max_rerolls_per_spin = 3
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"drone_dispatch"
+display_name = "Rideshare Drone Dispatch"
+ticket_price = 100000
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+reel_count = 3
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_taxi"), SubResource("Symbol_pin"), SubResource("Symbol_drone"), SubResource("Symbol_badge"), SubResource("Symbol_bolt")])
+payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
+screen_region = Rect2(267, 226, 450, 246)
+mechanic = SubResource("Mechanic_surge")

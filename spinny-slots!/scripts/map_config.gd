@@ -16,7 +16,7 @@ static func get_maps() -> Array:
 		{
 			"id": METROPOLIS_ID,
 			"name": "Metropolis",
-			"background_path": "", # Missing asset, will use fallback
+			"background_path": "res://assets/art/metropolis/metropolis_background.png",
 			"is_unlocked": GameState.metropolis_unlocked,
 			"unlock_requirement": "Defeat the Junk King to unlock Metropolis.",
 		}

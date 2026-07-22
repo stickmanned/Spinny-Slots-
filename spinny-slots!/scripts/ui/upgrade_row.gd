@@ -9,6 +9,11 @@ signal upgrade_requested(upgrade_id: StringName)
 
 var _config: UpgradeConfig
 var _hover_tween: Tween
+## Upgrade data source. Defaults to Economy (Junkyard's global tracks); the
+## Metropolis screen swaps in a per-machine provider. Any object exposing the
+## same get_upgrade_level/multiplier/cost, is_upgrade_maxed, and can_afford
+## methods works, so this row never needs to know which area it serves.
+var _provider: Object = Economy
 
 
 func _ready() -> void:
@@ -42,6 +47,11 @@ func _animate_scale(target_scale: Vector2) -> void:
 	_hover_tween.tween_property(self, "scale", target_scale, 0.12)
 
 
+func set_provider(provider: Object) -> void:
+	if provider != null:
+		_provider = provider
+
+
 func configure(config: UpgradeConfig) -> void:
 	_config = config
 	upgrade_name.text = config.display_name
@@ -53,16 +63,25 @@ func configure(config: UpgradeConfig) -> void:
 func refresh(purchases_enabled: bool) -> void:
 	if _config == null:
 		return
-	var level := Economy.get_upgrade_level(_config.upgrade_id)
-	var multiplier := Economy.get_upgrade_multiplier(_config.upgrade_id)
+	var level: int = _provider.get_upgrade_level(_config.upgrade_id)
+	var multiplier: float = _provider.get_upgrade_multiplier(_config.upgrade_id)
 	upgrade_status.text = "LV %d  •  %s" % [level, _format_multiplier(multiplier)]
-	if Economy.is_upgrade_maxed(_config.upgrade_id):
+	if _provider.is_upgrade_maxed(_config.upgrade_id):
 		cost_label.text = "MAX"
 		disabled = true
 		return
-	var cost := Economy.get_upgrade_cost(_config.upgrade_id)
-	cost_label.text = "$%d" % cost
-	disabled = not purchases_enabled or not Economy.can_afford(cost)
+	var cost: int = _provider.get_upgrade_cost(_config.upgrade_id)
+	cost_label.text = "$%s" % _format_cost(cost)
+	disabled = not purchases_enabled or not _provider.can_afford(cost)
+
+
+## Metropolis upgrade costs reach the millions; abbreviate so they fit the row.
+func _format_cost(amount: int) -> String:
+	if amount >= 1_000_000:
+		return ("%.2f" % (float(amount) / 1_000_000.0)).trim_suffix("0").trim_suffix("0").trim_suffix(".") + "M"
+	if amount >= 10_000:
+		return "%dK" % roundi(float(amount) / 1_000.0)
+	return str(amount)
 
 
 func _on_pressed() -> void:

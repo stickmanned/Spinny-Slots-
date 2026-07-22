@@ -1,0 +1,108 @@
+[gd_resource type="Resource" script_class="MetropolisMachineDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/metropolis_machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://resources/tickets/Hacker Terminal Ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" path="res://resources/machines/Hacker Terminal.png" id="3_cabinet"]
+[ext_resource type="Script" path="res://scripts/metropolis_symbol.gd" id="4_symbol"]
+[ext_resource type="Script" path="res://scripts/metropolis_payout_tier.gd" id="5_tier"]
+[ext_resource type="Script" path="res://scripts/metropolis_mechanic_config.gd" id="6_mechanic"]
+[ext_resource type="Texture2D" path="res://assets/icons/Firewall Hacker Terminal/chip.png" id="7_chip_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Firewall Hacker Terminal/lock.png" id="8_lock_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Firewall Hacker Terminal/shield.png" id="9_shield_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Firewall Hacker Terminal/virus.png" id="10_virus_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Firewall Hacker Terminal/key.png" id="11_key_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(520, 300, 920, 1500)
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(40, 600, 1920, 800)
+
+[sub_resource type="Resource" id="Symbol_chip"]
+script = ExtResource("4_symbol")
+symbol_id = &"chip"
+display_name = "Binary Chip"
+icon = ExtResource("7_chip_icon")
+tier = 0
+weight = 36.0
+
+[sub_resource type="Resource" id="Symbol_lock"]
+script = ExtResource("4_symbol")
+symbol_id = &"lock"
+display_name = "Padlock"
+icon = ExtResource("8_lock_icon")
+tier = 0
+weight = 28.0
+
+[sub_resource type="Resource" id="Symbol_shield"]
+script = ExtResource("4_symbol")
+symbol_id = &"shield"
+display_name = "Firewall Shield"
+icon = ExtResource("9_shield_icon")
+tier = 1
+weight = 18.0
+
+[sub_resource type="Resource" id="Symbol_virus"]
+script = ExtResource("4_symbol")
+symbol_id = &"virus"
+display_name = "Virus Icon"
+icon = ExtResource("10_virus_icon")
+tier = 2
+weight = 12.0
+
+[sub_resource type="Resource" id="Symbol_key"]
+script = ExtResource("4_symbol")
+symbol_id = &"key"
+display_name = "Golden Key"
+icon = ExtResource("11_key_icon")
+tier = 3
+weight = 6.0
+
+[sub_resource type="Resource" id="Tier_common"]
+script = ExtResource("5_tier")
+tier = 0
+payouts_by_count = {
+"3": 1850000
+}
+
+[sub_resource type="Resource" id="Tier_uncommon"]
+script = ExtResource("5_tier")
+tier = 1
+payouts_by_count = {
+"3": 5800000
+}
+
+[sub_resource type="Resource" id="Tier_rare"]
+script = ExtResource("5_tier")
+tier = 2
+payouts_by_count = {
+"3": 15800000
+}
+
+[sub_resource type="Resource" id="Tier_jackpot"]
+script = ExtResource("5_tier")
+tier = 3
+payouts_by_count = {
+"3": 52000000
+}
+
+[sub_resource type="Resource" id="Mechanic_hack"]
+script = ExtResource("6_mechanic")
+kind = 2
+hack_max_charges = 3
+hack_weight_shift_multiplier = 3.0
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"firewall"
+display_name = "Firewall Hacker Terminal"
+ticket_price = 250000
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+reel_count = 3
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_chip"), SubResource("Symbol_lock"), SubResource("Symbol_shield"), SubResource("Symbol_virus"), SubResource("Symbol_key")])
+payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
+screen_region = Rect2(160, 340, 640, 500)
+mechanic = SubResource("Mechanic_hack")

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://scripts/upgrade_config.gd" id="1_config"]
+[ext_resource type="Texture2D" path="res://assets/icons/flash.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_config")
+upgrade_id = &"spin_speed"
+display_name = "Spin Speed"
+icon = ExtResource("2_icon")
+base_cost = 1
+cost_growth = 1.3
+max_level = 10
+effect_per_level = 0.25
+cost_fraction_of_ticket = 0.35
+tooltip = "Speeds up each spin on this machine."

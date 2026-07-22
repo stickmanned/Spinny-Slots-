@@ -2,7 +2,7 @@ extends Node
 
 const JUNKYARD_SCENE: PackedScene = preload("res://scenes/junkyard_job.tscn")
 const JUNK_KING_BATTLE_SCENE: PackedScene = preload("res://scenes/junk_king_battle.tscn")
-const METROPOLIS_PREVIEW_SCENE: PackedScene = preload("res://scenes/metropolis_preview.tscn")
+const METROPOLIS_JOB_SCENE: PackedScene = preload("res://scenes/metropolis_job.tscn")
 const TRANSITION_DURATION := 0.24
 
 @onready var scene_host: Node = $SceneHost
@@ -66,15 +66,30 @@ func _connect_navigation(scene: Node) -> void:
 		scene.connect("junk_king_challenge_confirmed", _on_junk_king_challenge_confirmed)
 	if scene.has_signal("map_requested"):
 		scene.connect("map_requested", _on_map_requested)
+	# The Junk King battle's victory/defeat popup navigates through its own
+	# dedicated signals rather than map_requested; without these connections
+	# the RETURN TO JUNKYARD / VISIT METROPOLIS buttons emit into the void.
+	if scene.has_signal("return_to_junkyard_requested"):
+		scene.connect("return_to_junkyard_requested", _on_return_to_junkyard_requested)
+	if scene.has_signal("metropolis_requested"):
+		scene.connect("metropolis_requested", _on_metropolis_requested)
 
 
 func _on_junk_king_challenge_confirmed() -> void:
 	_transition_to(JUNK_KING_BATTLE_SCENE)
 
 
+func _on_return_to_junkyard_requested() -> void:
+	_transition_to(JUNKYARD_SCENE)
+
+
+func _on_metropolis_requested() -> void:
+	_transition_to(METROPOLIS_JOB_SCENE)
+
+
 func _on_map_requested(map_id: String) -> void:
 	if map_id == "metropolis" and GameState.metropolis_unlocked:
-		_transition_to(METROPOLIS_PREVIEW_SCENE)
+		_transition_to(METROPOLIS_JOB_SCENE)
 	elif map_id == "junkyard":
 		_transition_to(JUNKYARD_SCENE)
 

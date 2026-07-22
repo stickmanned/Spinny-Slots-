@@ -43,6 +43,9 @@ func _connect_game_state_signals() -> void:
 	GameState.sfx_enabled_changed.connect(_on_bool_value_changed)
 	GameState.story_progress_changed.connect(_on_story_progress_changed)
 	GameState.machine_tickets_changed.connect(_on_keyed_int_value_changed)
+	GameState.machine_mechanic_charges_changed.connect(_on_keyed_int_value_changed)
+	GameState.machine_free_rerolls_changed.connect(_on_keyed_int_value_changed)
+	GameState.machine_upgrade_levels_changed.connect(_on_machine_upgrade_level_changed)
 	GameState.machine_unlocked.connect(_on_machine_id_changed)
 	GameState.selected_machine_changed.connect(_on_machine_id_changed)
 
@@ -64,6 +67,10 @@ func _on_keyed_int_value_changed(_id: StringName, _value: int) -> void:
 
 
 func _on_machine_id_changed(_machine_id: StringName) -> void:
+	_queue_autosave()
+
+
+func _on_machine_upgrade_level_changed(_machine_id: StringName, _upgrade_id: StringName, _level: int) -> void:
 	_queue_autosave()
 
 
@@ -202,6 +209,9 @@ func _capture_document() -> Dictionary:
 			"selected_machine_id": String(GameState.selected_machine_id),
 			"unlocked_machine_ids": unlocked_machine_ids,
 			"ticket_counts": _sanitize_nonnegative_int_dictionary(GameState.machine_ticket_counts),
+			"mechanic_charges": _sanitize_nonnegative_int_dictionary(GameState.machine_mechanic_charges),
+			"free_rerolls": _sanitize_nonnegative_int_dictionary(GameState.machine_free_rerolls),
+			"machine_upgrade_levels": _sanitize_nonnegative_int_dictionary(GameState.machine_upgrade_levels),
 		},
 		"upgrades": _sanitize_nonnegative_int_dictionary(GameState.upgrade_levels),
 	}
@@ -390,6 +400,11 @@ func _normalize_document(raw: Dictionary) -> Dictionary:
 			"selected_machine_id": selected_machine_id,
 			"unlocked_machine_ids": unlocked_machine_ids,
 			"ticket_counts": _sanitize_nonnegative_int_dictionary(ticket_counts_value),
+			"mechanic_charges": _sanitize_nonnegative_int_dictionary(machines.get("mechanic_charges", {})),
+			"free_rerolls": _sanitize_nonnegative_int_dictionary(machines.get("free_rerolls", {})),
+			"machine_upgrade_levels": _sanitize_nonnegative_int_dictionary(
+				machines.get("machine_upgrade_levels", {})
+			),
 		},
 		"upgrades": _sanitize_nonnegative_int_dictionary(upgrades_value),
 	}
@@ -400,8 +415,15 @@ func _apply_document(document: Dictionary) -> void:
 	var story := _dictionary_or_empty(document.get("story", {}))
 	var machines := _dictionary_or_empty(document.get("machines", {}))
 	var ticket_counts := _sanitize_nonnegative_int_dictionary(machines.get("ticket_counts", {}))
+	var mechanic_charges := _sanitize_nonnegative_int_dictionary(machines.get("mechanic_charges", {}))
+	var free_rerolls := _sanitize_nonnegative_int_dictionary(machines.get("free_rerolls", {}))
+	var machine_upgrade_levels := _sanitize_nonnegative_int_dictionary(
+		machines.get("machine_upgrade_levels", {})
+	)
 	var upgrade_levels := _sanitize_nonnegative_int_dictionary(document.get("upgrades", {}))
 	var old_ticket_ids := _dictionary_keys_as_strings(GameState.machine_ticket_counts)
+	var old_mechanic_charge_ids := _dictionary_keys_as_strings(GameState.machine_mechanic_charges)
+	var old_free_reroll_ids := _dictionary_keys_as_strings(GameState.machine_free_rerolls)
 	var old_upgrade_ids := _dictionary_keys_as_strings(GameState.upgrade_levels)
 
 	_is_applying_load = true
@@ -432,6 +454,15 @@ func _apply_document(document: Dictionary) -> void:
 	GameState.machine_ticket_counts.clear()
 	for machine_id in ticket_counts:
 		GameState.machine_ticket_counts[machine_id] = int(ticket_counts[machine_id])
+	GameState.machine_mechanic_charges.clear()
+	for machine_id in mechanic_charges:
+		GameState.machine_mechanic_charges[machine_id] = int(mechanic_charges[machine_id])
+	GameState.machine_free_rerolls.clear()
+	for machine_id in free_rerolls:
+		GameState.machine_free_rerolls[machine_id] = int(free_rerolls[machine_id])
+	GameState.machine_upgrade_levels.clear()
+	for upgrade_key in machine_upgrade_levels:
+		GameState.machine_upgrade_levels[upgrade_key] = int(machine_upgrade_levels[upgrade_key])
 	GameState.upgrade_levels.clear()
 	for upgrade_id in upgrade_levels:
 		GameState.upgrade_levels[upgrade_id] = int(upgrade_levels[upgrade_id])
@@ -443,6 +474,20 @@ func _apply_document(document: Dictionary) -> void:
 	for machine_id in ticket_ids:
 		GameState.machine_tickets_changed.emit(
 			StringName(machine_id), GameState.get_machine_ticket_count(StringName(machine_id))
+		)
+	var mechanic_charge_ids := _merge_unique_strings(
+		old_mechanic_charge_ids, _dictionary_keys_as_strings(GameState.machine_mechanic_charges)
+	)
+	for machine_id in mechanic_charge_ids:
+		GameState.machine_mechanic_charges_changed.emit(
+			StringName(machine_id), GameState.get_machine_mechanic_charges(StringName(machine_id))
+		)
+	var free_reroll_ids := _merge_unique_strings(
+		old_free_reroll_ids, _dictionary_keys_as_strings(GameState.machine_free_rerolls)
+	)
+	for machine_id in free_reroll_ids:
+		GameState.machine_free_rerolls_changed.emit(
+			StringName(machine_id), GameState.get_machine_free_rerolls(StringName(machine_id))
 		)
 	var upgrade_ids := _merge_unique_strings(
 		old_upgrade_ids, _dictionary_keys_as_strings(GameState.upgrade_levels)

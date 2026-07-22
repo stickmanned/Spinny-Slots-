@@ -1,13 +1,14 @@
 extends Button
 
-signal purchase_requested(machine: MachineDefinition)
-signal selected(machine: MachineDefinition)
+## Untyped machine param — see machine_selector_panel.gd for why.
+signal purchase_requested(machine)
+signal selected(machine)
 
 @onready var ticket_art: TextureRect = %TicketArt
 @onready var machine_name: Label = %MachineName
 @onready var price_label: Label = %PriceLabel
 
-var _machine: MachineDefinition
+var _machine
 var _purchase_enabled := true
 var _hover_tween: Tween
 
@@ -43,7 +44,7 @@ func _animate_scale(target_scale: Vector2) -> void:
 	_hover_tween.tween_property(self, "scale", target_scale, 0.12)
 
 
-func configure(machine: MachineDefinition, is_selected: bool) -> void:
+func configure(machine, is_selected: bool) -> void:
 	_machine = machine
 	button_pressed = is_selected
 	refresh()
@@ -64,7 +65,7 @@ func refresh() -> void:
 func _update_name_font_size() -> void:
 	if machine_name == null or _machine == null:
 		return
-	var text_len := _machine.display_name.length()
+	var text_len: int = _machine.display_name.length()
 	var font_size := 15
 	if text_len > 16:
 		font_size = 11
@@ -82,7 +83,7 @@ func set_purchase_enabled(enabled: bool) -> void:
 	refresh()
 
 
-func get_machine() -> MachineDefinition:
+func get_machine():
 	return _machine
 
 

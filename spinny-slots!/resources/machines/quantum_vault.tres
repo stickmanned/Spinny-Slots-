@@ -1,0 +1,115 @@
+[gd_resource type="Resource" script_class="MetropolisMachineDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/metropolis_machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://resources/tickets/Quantum Vault Ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" path="res://resources/machines/Quantum Vault.png" id="3_cabinet"]
+[ext_resource type="Script" path="res://scripts/metropolis_symbol.gd" id="4_symbol"]
+[ext_resource type="Script" path="res://scripts/metropolis_payout_tier.gd" id="5_tier"]
+[ext_resource type="Script" path="res://scripts/metropolis_mechanic_config.gd" id="6_mechanic"]
+[ext_resource type="Texture2D" path="res://assets/icons/Quantum Vault/quantum_particle.png" id="7_quantum_particle_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Quantum Vault/vault_gear.png" id="8_vault_gear_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Quantum Vault/quark_fragment.png" id="9_quark_fragment_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Quantum Vault/antimatter_core.png" id="10_antimatter_core_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Quantum Vault/superposition_symbol.png" id="11_superposition_symbol_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(480, 300, 980, 1460)
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(160, 560, 1680, 880)
+
+[sub_resource type="Resource" id="Symbol_quantum_particle"]
+script = ExtResource("4_symbol")
+symbol_id = &"quantum_particle"
+display_name = "Quantum Particle"
+icon = ExtResource("7_quantum_particle_icon")
+tier = 0
+weight = 32.0
+
+[sub_resource type="Resource" id="Symbol_vault_gear"]
+script = ExtResource("4_symbol")
+symbol_id = &"vault_gear"
+display_name = "Vault Gear"
+icon = ExtResource("8_vault_gear_icon")
+tier = 0
+weight = 24.0
+
+[sub_resource type="Resource" id="Symbol_quark_fragment"]
+script = ExtResource("4_symbol")
+symbol_id = &"quark_fragment"
+display_name = "Quark Fragment"
+icon = ExtResource("9_quark_fragment_icon")
+tier = 1
+weight = 20.0
+
+[sub_resource type="Resource" id="Symbol_antimatter_core"]
+script = ExtResource("4_symbol")
+symbol_id = &"antimatter_core"
+display_name = "Antimatter Core"
+icon = ExtResource("10_antimatter_core_icon")
+tier = 2
+weight = 15.0
+
+[sub_resource type="Resource" id="Symbol_superposition"]
+script = ExtResource("4_symbol")
+symbol_id = &"superposition_symbol"
+display_name = "Superposition Symbol"
+icon = ExtResource("11_superposition_symbol_icon")
+tier = 3
+weight = 9.0
+
+[sub_resource type="Resource" id="Tier_common"]
+script = ExtResource("5_tier")
+tier = 0
+payouts_by_count = {
+"3": 1760000,
+"4": 7000000,
+"5": 35000000
+}
+
+[sub_resource type="Resource" id="Tier_uncommon"]
+script = ExtResource("5_tier")
+tier = 1
+payouts_by_count = {
+"3": 4900000,
+"4": 19700000,
+"5": 98000000
+}
+
+[sub_resource type="Resource" id="Tier_rare"]
+script = ExtResource("5_tier")
+tier = 2
+payouts_by_count = {
+"3": 12700000,
+"4": 50700000,
+"5": 253000000
+}
+
+[sub_resource type="Resource" id="Tier_jackpot"]
+script = ExtResource("5_tier")
+tier = 3
+payouts_by_count = {
+"3": 35000000,
+"4": 141000000,
+"5": 704000000
+}
+
+[sub_resource type="Resource" id="Mechanic_superposition"]
+script = ExtResource("6_mechanic")
+kind = 4
+superposition_collapse_duration = 0.32
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"quantum_vault"
+display_name = "Quantum Vault"
+ticket_price = 2500000
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+reel_count = 5
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_quantum_particle"), SubResource("Symbol_vault_gear"), SubResource("Symbol_quark_fragment"), SubResource("Symbol_antimatter_core"), SubResource("Symbol_superposition")])
+payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
+screen_region = Rect2(180, 340, 680, 520)
+mechanic = SubResource("Mechanic_superposition")

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/dev/milestone_3_symbols_test.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/dev/milestone_3_symbols.gd" id="1_script"]
 
 [node name="Milestone3SymbolsTest" type="Node"]
 script = ExtResource("1_script")

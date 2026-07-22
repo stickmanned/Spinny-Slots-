@@ -1,0 +1,117 @@
+[gd_resource type="Resource" script_class="MetropolisMachineDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/metropolis_machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://resources/tickets/Skyline Billboard Ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" path="res://resources/machines/Billboard Jackpot.png" id="3_cabinet"]
+[ext_resource type="Script" path="res://scripts/metropolis_symbol.gd" id="4_symbol"]
+[ext_resource type="Script" path="res://scripts/metropolis_payout_tier.gd" id="5_tier"]
+[ext_resource type="Script" path="res://scripts/metropolis_mechanic_config.gd" id="6_mechanic"]
+[ext_resource type="Texture2D" path="res://assets/icons/Skyline Billboard Jackpot/bulb.png" id="7_bulb_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Skyline Billboard Jackpot/ticket_stub.png" id="8_ticket_stub_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Skyline Billboard Jackpot/spotlight.png" id="9_spotlight_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Skyline Billboard Jackpot/golden_star.png" id="10_golden_star_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Skyline Billboard Jackpot/neon_sign_burst.png" id="11_neon_sign_burst_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(400, 360, 1160, 1200)
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(320, 720, 1360, 560)
+
+[sub_resource type="Resource" id="Symbol_bulb"]
+script = ExtResource("4_symbol")
+symbol_id = &"bulb"
+display_name = "Bulb Trim"
+icon = ExtResource("7_bulb_icon")
+tier = 0
+weight = 34.0
+
+[sub_resource type="Resource" id="Symbol_ticket_stub"]
+script = ExtResource("4_symbol")
+symbol_id = &"ticket_stub"
+display_name = "Ticket Stub"
+icon = ExtResource("8_ticket_stub_icon")
+tier = 0
+weight = 26.0
+
+[sub_resource type="Resource" id="Symbol_spotlight"]
+script = ExtResource("4_symbol")
+symbol_id = &"spotlight"
+display_name = "Spotlight"
+icon = ExtResource("9_spotlight_icon")
+tier = 1
+weight = 20.0
+
+[sub_resource type="Resource" id="Symbol_golden_star"]
+script = ExtResource("4_symbol")
+symbol_id = &"golden_star"
+display_name = "Gold Star"
+icon = ExtResource("10_golden_star_icon")
+tier = 2
+weight = 13.0
+
+[sub_resource type="Resource" id="Symbol_neon_sign_burst"]
+script = ExtResource("4_symbol")
+symbol_id = &"neon_sign_burst"
+display_name = "Neon Sign Burst"
+icon = ExtResource("11_neon_sign_burst_icon")
+tier = 3
+weight = 7.0
+
+[sub_resource type="Resource" id="Tier_common"]
+script = ExtResource("5_tier")
+tier = 0
+payouts_by_count = {
+"3": 385000,
+"4": 1550000,
+"5": 7700000
+}
+
+[sub_resource type="Resource" id="Tier_uncommon"]
+script = ExtResource("5_tier")
+tier = 1
+payouts_by_count = {
+"3": 1030000,
+"4": 4100000,
+"5": 20500000
+}
+
+[sub_resource type="Resource" id="Tier_rare"]
+script = ExtResource("5_tier")
+tier = 2
+payouts_by_count = {
+"3": 2570000,
+"4": 10300000,
+"5": 51000000
+}
+
+[sub_resource type="Resource" id="Tier_jackpot"]
+script = ExtResource("5_tier")
+tier = 3
+payouts_by_count = {
+"3": 7700000,
+"4": 31000000,
+"5": 154000000
+}
+
+[sub_resource type="Resource" id="Mechanic_cascade"]
+script = ExtResource("6_mechanic")
+kind = 3
+cascade_max_tiers = 4
+cascade_tier_multipliers = Array[float]([1.0, 1.25, 1.5, 2.0])
+cascade_jackpot_grants_bonus_tier = true
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"billboard"
+display_name = "Skyline Billboard Jackpot"
+ticket_price = 1000000
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+reel_count = 5
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_bulb"), SubResource("Symbol_ticket_stub"), SubResource("Symbol_spotlight"), SubResource("Symbol_golden_star"), SubResource("Symbol_neon_sign_burst")])
+payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
+screen_region = Rect2(260, 440, 680, 360)
+mechanic = SubResource("Mechanic_cascade")

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/arrow_left.svg" id="3_left_arrow"]
 [ext_resource type="Texture2D" path="res://assets/art/ui/game_gui/arrow_right.svg" id="4_right_arrow"]
 [ext_resource type="PackedScene" path="res://scenes/ui/reel_strip.tscn" id="5_reel_strip"]
+[ext_resource type="PackedScene" path="res://scenes/ui/reel_strip_5.tscn" id="6_reel_strip_5"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBox_transparent"]
 
@@ -55,6 +56,10 @@ transform_pivot_offset = Vector2(216, 235)
 
 [node name="ReelStrip" parent="Content/SelectorRow/CabinetArt" instance=ExtResource("5_reel_strip")]
 unique_name_in_owner = true
+
+[node name="ReelStrip5" parent="Content/SelectorRow/CabinetArt" instance=ExtResource("6_reel_strip_5")]
+unique_name_in_owner = true
+visible = false
 
 [node name="RightArrow" type="TextureButton" parent="Content/SelectorRow"]
 unique_name_in_owner = true

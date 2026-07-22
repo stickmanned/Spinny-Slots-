@@ -7,6 +7,7 @@ const MapConfig = preload("res://scripts/map_config.gd")
 signal map_requested(map_id: String)
 
 
+@onready var area_label: Label = %AreaLabel
 @onready var coin_value: Label = %CoinValue
 @onready var gem_value: Label = %GemValue
 @onready var upgrade_rows: VBoxContainer = %UpgradeRows
@@ -28,6 +29,10 @@ var _currency_tween: Tween
 var _upgrade_tween: Tween
 var _coin_pulse_tween: Tween
 var _upgrades_enabled := true
+## Source for the upgrade panel. Defaults to Economy (Junkyard's global
+## tracks); metropolis_job swaps in a per-machine provider when its selected
+## machine changes.
+var _upgrade_provider: Object = Economy
 
 
 func _ready() -> void:
@@ -49,7 +54,10 @@ func _ready() -> void:
 	sfx_button.toggled.connect(_on_sfx_toggled)
 	_update_sfx_text()
 	settings_button.visible = GameState.day_job_tutorial_completed
-	map_button.visible = GameState.metropolis_unlocked
+	# Always shown alongside Settings, regardless of area-unlock state — Map
+	# Select itself renders locked areas with their unlock requirement rather
+	# than hiding them, so there's no need to hide the button that opens it.
+	map_button.visible = GameState.day_job_tutorial_completed
 	map_button.pressed.connect(_on_map_pressed)
 	close_map_button.pressed.connect(_on_close_map_pressed)
 	ButtonHover.attach(map_button)
@@ -104,7 +112,7 @@ func enter_machine_mode(duration: float) -> void:
 	currency_panel.visible = true
 	upgrade_panel.visible = true
 	settings_button.visible = true
-	map_button.visible = GameState.metropolis_unlocked
+	map_button.visible = true
 	if _currency_tween and _currency_tween.is_valid():
 		_currency_tween.kill()
 	if duration <= 0.0:
@@ -131,12 +139,21 @@ func _stop_visibility_tweens() -> void:
 		_upgrade_tween.kill()
 
 
+## Points the upgrade panel at a different upgrade track (e.g. a per-machine
+## Metropolis provider) and rebuilds the rows against it. Passing null restores
+## the Junkyard/global Economy source.
+func set_upgrade_provider(provider: Object) -> void:
+	_upgrade_provider = provider if provider != null else Economy
+	_build_upgrade_rows()
+
+
 func _build_upgrade_rows() -> void:
 	for child in upgrade_rows.get_children():
 		child.queue_free()
-	for config in Economy.get_upgrade_configs():
+	for config in _upgrade_provider.get_upgrade_configs():
 		var row := UPGRADE_ROW_SCENE.instantiate()
 		upgrade_rows.add_child(row)
+		row.set_provider(_upgrade_provider)
 		row.configure(config)
 		row.connect("upgrade_requested", _on_upgrade_requested)
 	_refresh_upgrade_rows()
@@ -174,7 +191,8 @@ func _refresh_upgrade_rows() -> void:
 func _on_upgrade_requested(upgrade_id: StringName) -> void:
 	if not _upgrades_enabled:
 		return
-	Economy.purchase_upgrade(upgrade_id)
+	_upgrade_provider.purchase_upgrade(upgrade_id)
+	_refresh_upgrade_rows()
 
 
 func _on_upgrade_levels_changed(_upgrade_id: StringName, _level: int) -> void:
@@ -220,9 +238,15 @@ func _update_sfx_text() -> void:
 	sfx_button.text = "SOUND EFFECTS: %s" % ("ON" if GameState.sfx_enabled else "OFF")
 
 
+## Sets the currency panel's area title. Each area's job scene calls this in
+## its own _ready so the shared HUD never shows a stale hardcoded area name.
+func set_area_name(area_name: String) -> void:
+	area_label.text = area_name
+
+
 func show_settings_button() -> void:
 	settings_button.visible = true
-	map_button.visible = GameState.metropolis_unlocked
+	map_button.visible = true
 
 
 func set_controls_enabled(enabled: bool) -> void:
@@ -281,7 +305,7 @@ func _populate_map_cards() -> void:
 	
 	var current_scene_name = get_tree().current_scene.scene_file_path.get_file().get_basename()
 	var current_map_id = "junkyard" # default
-	if current_scene_name == "metropolis_preview":
+	if current_scene_name == "metropolis_job":
 		current_map_id = "metropolis"
 	elif current_scene_name == "junkyard_job":
 		current_map_id = "junkyard"

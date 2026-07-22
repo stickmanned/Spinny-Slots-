@@ -1,0 +1,101 @@
+[gd_resource type="Resource" script_class="MetropolisMachineDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/metropolis_machine_definition.gd" id="1_machine"]
+[ext_resource type="Texture2D" path="res://resources/tickets/Neon Arcade Ticket.png" id="2_ticket"]
+[ext_resource type="Texture2D" path="res://resources/machines/Neon Arcade.png" id="3_cabinet"]
+[ext_resource type="Script" path="res://scripts/metropolis_symbol.gd" id="4_symbol"]
+[ext_resource type="Script" path="res://scripts/metropolis_payout_tier.gd" id="5_tier"]
+[ext_resource type="Texture2D" path="res://assets/icons/Neon Arcade Cabinet/joystick.png" id="6_joystick_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Neon Arcade Cabinet/coin.png" id="7_coin_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Neon Arcade Cabinet/controller.png" id="8_controller_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Neon Arcade Cabinet/heart.png" id="9_heart_icon"]
+[ext_resource type="Texture2D" path="res://assets/icons/Neon Arcade Cabinet/star.png" id="10_star_icon"]
+
+[sub_resource type="AtlasTexture" id="Atlas_cabinet"]
+atlas = ExtResource("3_cabinet")
+region = Rect2(520, 360, 960, 1320)
+
+[sub_resource type="AtlasTexture" id="Atlas_ticket"]
+atlas = ExtResource("2_ticket")
+region = Rect2(220, 660, 1560, 680)
+
+[sub_resource type="Resource" id="Symbol_joystick"]
+script = ExtResource("4_symbol")
+symbol_id = &"joystick"
+display_name = "Joystick"
+icon = ExtResource("6_joystick_icon")
+tier = 0
+weight = 38.0
+
+[sub_resource type="Resource" id="Symbol_coin"]
+script = ExtResource("4_symbol")
+symbol_id = &"coin"
+display_name = "Coin Slot Token"
+icon = ExtResource("7_coin_icon")
+tier = 0
+weight = 30.0
+
+[sub_resource type="Resource" id="Symbol_controller"]
+script = ExtResource("4_symbol")
+symbol_id = &"controller"
+display_name = "Controller"
+icon = ExtResource("8_controller_icon")
+tier = 1
+weight = 18.0
+
+[sub_resource type="Resource" id="Symbol_heart"]
+script = ExtResource("4_symbol")
+symbol_id = &"heart"
+display_name = "Pixel Heart"
+icon = ExtResource("9_heart_icon")
+tier = 2
+weight = 10.0
+
+[sub_resource type="Resource" id="Symbol_star"]
+script = ExtResource("4_symbol")
+symbol_id = &"star"
+display_name = "Holographic Star"
+icon = ExtResource("10_star_icon")
+tier = 3
+weight = 4.0
+
+[sub_resource type="Resource" id="Tier_common"]
+script = ExtResource("5_tier")
+tier = 0
+payouts_by_count = {
+"3": 70000
+}
+
+[sub_resource type="Resource" id="Tier_uncommon"]
+script = ExtResource("5_tier")
+tier = 1
+payouts_by_count = {
+"3": 200000
+}
+
+[sub_resource type="Resource" id="Tier_rare"]
+script = ExtResource("5_tier")
+tier = 2
+payouts_by_count = {
+"3": 550000
+}
+
+[sub_resource type="Resource" id="Tier_jackpot"]
+script = ExtResource("5_tier")
+tier = 3
+payouts_by_count = {
+"3": 1800000
+}
+
+[resource]
+script = ExtResource("1_machine")
+machine_id = &"neon_arcade"
+display_name = "Neon Arcade Cabinet"
+ticket_price = 10000
+ticket_texture = SubResource("Atlas_ticket")
+cabinet_texture = SubResource("Atlas_cabinet")
+reel_count = 3
+symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_joystick"), SubResource("Symbol_coin"), SubResource("Symbol_controller"), SubResource("Symbol_heart"), SubResource("Symbol_star")])
+payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
+screen_region = Rect2(180, 440, 600, 380)
+mechanic = null
