@@ -23,7 +23,6 @@ func _run() -> void:
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--machine="):
 			target_index = clampi(int(argument.trim_prefix("--machine=")), 0, MACHINES.size() - 1)
-
 	GameState.reset_for_new_game()
 	GameState.metropolis_unlocked = true
 	GameState.money = 5_000_000
@@ -44,7 +43,10 @@ func _run() -> void:
 		await get_tree().process_frame
 
 	var image := get_viewport().get_texture().get_image()
-	var out_path := "user://metropolis_shot_%d.png" % target_index
+	var window_size := DisplayServer.window_get_size()
+	var out_path := "user://metropolis_shot_%d_%dx%d.png" % [
+		target_index, window_size.x, window_size.y,
+	]
 	image.save_png(out_path)
 	print("Saved screenshot to: ", ProjectSettings.globalize_path(out_path))
 	get_tree().quit(0)

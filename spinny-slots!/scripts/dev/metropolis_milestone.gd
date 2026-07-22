@@ -10,6 +10,7 @@ const MACHINES: Array[MetropolisMachineDefinition] = [
 ]
 const SIMULATION_SPINS := 4000
 const FREQUENCY_TOLERANCE := 0.05
+const BALANCE_SIMULATION_SPINS := 120000
 const TEST_SAVE_PATH := "user://metropolis_milestone_test_save.json"
 
 var _failures: Array[String] = []
@@ -24,12 +25,13 @@ func _run() -> void:
 	_verify_machine_data_shape()
 	_verify_weighted_distribution(MACHINES[0])
 	_verify_three_reel_match_evaluation()
-	_verify_five_reel_count_evaluation()
+	_verify_wide_reel_count_evaluation()
 	_verify_cascade_invariants()
 	_verify_ticket_purchase_and_spend()
 	_verify_hack_charge_award_and_spend()
 	_verify_surge_reroll()
 	_verify_per_machine_upgrades()
+	_verify_baseline_balance_band()
 	_verify_save_round_trip()
 	await _verify_job_scene_spin()
 	Engine.time_scale = 1.0
@@ -48,8 +50,15 @@ func _verify_machine_data_shape() -> void:
 		&"neon_arcade": 3,
 		&"drone_dispatch": 3,
 		&"firewall": 3,
-		&"billboard": 5,
+		&"billboard": 4,
 		&"quantum_vault": 5,
+	}
+	var expected_ticket_prices := {
+		&"neon_arcade": 10_000,
+		&"drone_dispatch": 100_000,
+		&"firewall": 250_000,
+		&"billboard": 1_000_000,
+		&"quantum_vault": 2_500_000,
 	}
 	for machine in MACHINES:
 		_assert_equal(machine.symbols.size(), 5, "%s defines exactly five symbols" % machine.display_name)
@@ -58,12 +67,15 @@ func _verify_machine_data_shape() -> void:
 			int(expected_reel_counts[machine.machine_id]),
 			"%s has the expected reel count" % machine.display_name
 		)
+		_assert_equal(machine.ticket_price, int(expected_ticket_prices[machine.machine_id]), "%s keeps its final ticket price" % machine.display_name)
 		_assert_true(machine.screen_region.has_area(), "%s defines a cabinet screen region" % machine.display_name)
 		_assert_equal(machine.payout_tiers.size(), 4, "%s defines all four payout tiers" % machine.display_name)
 		var seen_tiers: Dictionary = {}
 		for tier in machine.payout_tiers:
 			seen_tiers[tier.tier] = true
-			var expected_counts := [3] if machine.reel_count == 3 else [3, 4, 5]
+			var expected_counts: Array[int] = [3]
+			if machine.reel_count > 3:
+				expected_counts.assign(range(3, machine.reel_count + 1))
 			for count in expected_counts:
 				_assert_true(
 					tier.get_payout(count) > 0,
@@ -114,30 +126,41 @@ func _verify_three_reel_match_evaluation() -> void:
 	_assert_true(no_matches.is_empty(), "Two-of-three does not qualify as a win on a 3-reel machine")
 
 
-func _verify_five_reel_count_evaluation() -> void:
-	var machine := MACHINES[3]
-	var common := machine.symbols[0]
-	var filler := machine.symbols[1]
+func _verify_wide_reel_count_evaluation() -> void:
+	var billboard := MACHINES[3]
+	var common := billboard.symbols[0]
+	var filler := billboard.symbols[1]
 
-	var three_of_five: Array[MetropolisSymbol] = [common, common, common, filler, filler]
-	var matches_3 := MetropolisEconomy.evaluate_matches(machine, three_of_five)
-	_assert_equal(matches_3.size(), 1, "3-of-5 produces one qualifying match")
+	var two_of_four: Array[MetropolisSymbol] = [common, common, filler, filler]
+	var matches_2 := MetropolisEconomy.evaluate_matches(billboard, two_of_four)
+	_assert_true(matches_2.is_empty(), "2-of-4 does not qualify as a Skyline win")
+
+	var three_of_four: Array[MetropolisSymbol] = [common, common, common, filler]
+	var matches_3 := MetropolisEconomy.evaluate_matches(billboard, three_of_four)
+	_assert_equal(matches_3.size(), 1, "3-of-4 produces one Skyline match")
 	if not matches_3.is_empty():
-		_assert_equal(int(matches_3[0]["payout"]), machine.get_payout(common.tier, 3), "3-of-5 pays the 3-count tier payout")
+		_assert_equal(int(matches_3[0]["payout"]), billboard.get_payout(common.tier, 3), "3-of-4 pays Skyline's 3-count payout")
 
-	var two_of_five: Array[MetropolisSymbol] = [common, common, filler, filler, filler]
-	var matches_2 := MetropolisEconomy.evaluate_matches(machine, two_of_five)
-	var common_match_present := false
-	for match_entry in matches_2:
-		if match_entry["symbol_id"] == common.symbol_id:
-			common_match_present = true
-	_assert_true(not common_match_present, "2-of-5 does not qualify as a win for that symbol")
+	var four_of_four: Array[MetropolisSymbol] = [common, common, common, common]
+	var matches_4 := MetropolisEconomy.evaluate_matches(billboard, four_of_four)
+	_assert_equal(matches_4.size(), 1, "4-of-4 produces one Skyline match")
+	if not matches_4.is_empty():
+		_assert_equal(int(matches_4[0]["payout"]), billboard.get_payout(common.tier, 4), "4-of-4 pays Skyline's 4-count payout")
 
-	var five_of_five: Array[MetropolisSymbol] = [common, common, common, common, common]
-	var matches_5 := MetropolisEconomy.evaluate_matches(machine, five_of_five)
-	_assert_equal(matches_5.size(), 1, "5-of-5 produces one qualifying match")
+	var quantum := MACHINES[4]
+	var quantum_common := quantum.symbols[0]
+	var quantum_filler := quantum.symbols[1]
+	var five_of_five: Array[MetropolisSymbol] = [
+		quantum_common, quantum_common, quantum_common, quantum_common, quantum_common,
+	]
+	var matches_5 := MetropolisEconomy.evaluate_matches(quantum, five_of_five)
+	_assert_equal(matches_5.size(), 1, "Quantum Vault still resolves 5-of-5")
 	if not matches_5.is_empty():
-		_assert_equal(int(matches_5[0]["payout"]), machine.get_payout(common.tier, 5), "5-of-5 pays the 5-count tier payout")
+		_assert_equal(int(matches_5[0]["payout"]), quantum.get_payout(quantum_common.tier, 5), "Quantum 5-of-5 pays its configured payout")
+	var quantum_two: Array[MetropolisSymbol] = [
+		quantum_common, quantum_common, quantum_filler, quantum_filler, quantum.symbols[2],
+	]
+	_assert_true(MetropolisEconomy.evaluate_matches(quantum, quantum_two).is_empty(), "Quantum 2-of-5 remains a loss")
 
 
 func _verify_cascade_invariants() -> void:
@@ -285,6 +308,22 @@ func _verify_per_machine_upgrades() -> void:
 		"Coin Multiplier scales the same seeded spin's payout"
 	)
 	GameState.reset_for_new_game()
+
+
+func _verify_baseline_balance_band() -> void:
+	for machine in MACHINES:
+		var rng := RandomNumberGenerator.new()
+		rng.seed = 20260720
+		var total_payout := 0.0
+		for _spin_index in range(BALANCE_SIMULATION_SPINS):
+			var outcome := MetropolisEconomy.calculate_machine_spin(machine, rng)
+			total_payout += float(outcome.get("payout", 0))
+		var average_payout := total_payout / float(BALANCE_SIMULATION_SPINS)
+		var rtp := average_payout / float(machine.ticket_price)
+		_assert_true(
+			rtp >= 0.70 and rtp <= 0.95,
+			"%s fixed-seed baseline RTP %.1f%% stays near the 75-90%% target" % [machine.display_name, rtp * 100.0]
+		)
 
 
 func _verify_save_round_trip() -> void:

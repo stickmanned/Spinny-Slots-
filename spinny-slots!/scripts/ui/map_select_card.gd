@@ -50,6 +50,18 @@ func _ready() -> void:
 	pressed.connect(_on_pressed)
 	ButtonHover.attach(self, Vector2(1.04, 1.04))
 
+
+func get_map_id() -> String:
+	return _map_id
+
+
+func is_current_map() -> bool:
+	return _is_current
+
+
+func is_unlocked_map() -> bool:
+	return _is_unlocked
+
 func _on_pressed() -> void:
 	if _is_current:
 		# Just jiggle or ignore

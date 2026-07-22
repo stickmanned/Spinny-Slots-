@@ -120,6 +120,7 @@ func _ready() -> void:
 	junk_king_confirmation.connect("declined", _on_junk_king_challenge_declined)
 	hud.map_requested.connect(func(id: String): map_requested.emit(id))
 	hud.call("set_area_name", "JUNKYARD")
+	hud.call("set_current_map_id", MapConfig.JUNKYARD_ID)
 	machine_ticket_shop.connect("purchase_requested", _on_ticket_purchase_requested)
 	machine_ticket_shop.connect("machine_selected", _on_ticket_machine_selected)
 	machine_selector.connect("selection_changed", _on_machine_selection_changed)

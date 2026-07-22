@@ -6,7 +6,7 @@ const PAYTABLE_ROW_SCENE: PackedScene = preload("res://scenes/ui/metropolis_payt
 
 
 ## Reads entirely from the machine's own data, so it automatically shows the
-## correct 3- or 5-symbol set and payout curve for whichever machine is
+## correct 3-, 4-, or 5-reel payout curve for whichever machine is
 ## selected, with no per-machine UI code.
 func configure(machine: MetropolisMachineDefinition) -> void:
 	for child in rows_container.get_children():

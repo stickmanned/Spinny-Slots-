@@ -1,6 +1,8 @@
 extends Control
 
 signal map_requested(map_id: String)
+signal spin_started(machine_id: StringName)
+signal spin_completed(machine_id: StringName, payout: int)
 
 const MACHINES: Array[MetropolisMachineDefinition] = [
 	preload("res://resources/machines/neon_arcade.tres"),
@@ -68,6 +70,8 @@ func _ready() -> void:
 		GameState.selected_machine_id = _selected_machine.machine_id
 	hud.call("enter_machine_mode", 0.0)
 	hud.call("set_area_name", "METROPOLIS")
+	hud.call("set_current_map_id", MapConfig.METROPOLIS_ID)
+	ticket_shop.call("set_extension_mode", true)
 	# No Metropolis rival/boss is defined yet, so the phone shows only its
 	# idle icon — the "incoming call" boss trigger is intentionally not wired.
 	phone_notification.call("show_idle", _build_phone_texture())
@@ -171,13 +175,13 @@ func _refresh_surge_panel() -> void:
 	surge_value_label.text = "Surge %s" % _format_multiplier(_surge_current_value)
 	var free_rerolls := GameState.get_machine_free_rerolls(_selected_machine.machine_id)
 	var rerolls_left := _selected_machine.mechanic.surge_max_rerolls_per_spin - _surge_rerolls_used
-	surge_reroll_button.disabled = _surge_locked or rerolls_left <= 0
+	surge_reroll_button.disabled = _spin_in_progress or _surge_locked or rerolls_left <= 0
 	surge_reroll_button.text = (
 		"REROLL (FREE TOKEN)"
 		if free_rerolls > 0
 		else "REROLL ($%d)" % _selected_machine.mechanic.surge_reroll_cost
 	)
-	surge_lock_button.disabled = _surge_locked
+	surge_lock_button.disabled = _spin_in_progress or _surge_locked
 
 
 ## GDScript's % formatter has no %g; format surge multipliers as x1 / x1.5 / x5
@@ -217,7 +221,7 @@ func _refresh_hack_panel() -> void:
 		button.text = "Reel %d" % (reel_index + 1)
 		button.toggle_mode = true
 		button.button_pressed = reel_index == _hack_target_reel_index
-		button.disabled = charges <= 0
+		button.disabled = _spin_in_progress or charges <= 0
 		button.pressed.connect(_on_hack_reel_button_pressed.bind(reel_index))
 		hack_reel_buttons.add_child(button)
 
@@ -240,6 +244,7 @@ func _refresh_spin_button() -> void:
 func _on_spin_pressed() -> void:
 	if _spin_in_progress or _selected_machine == null:
 		return
+	var spun_machine := _selected_machine
 
 	var options := {}
 	if _mechanic_kind() == MetropolisMechanicConfig.Kind.SURGE_MULTIPLIER:
@@ -247,22 +252,24 @@ func _on_spin_pressed() -> void:
 	if _mechanic_kind() == MetropolisMechanicConfig.Kind.HACK_CHARGE and _hack_target_reel_index >= 0:
 		options["spend_hack_charge_on_reel_index"] = _hack_target_reel_index
 
-	var outcome := MetropolisEconomy.prepare_machine_spin(_selected_machine, options)
+	var outcome := MetropolisEconomy.prepare_machine_spin(spun_machine, options)
 	if outcome.is_empty():
 		_refresh_spin_button()
 		return
 
 	_spin_in_progress = true
+	spin_started.emit(spun_machine.machine_id)
 	result_label.text = "SPINNING..."
 	payout_label.text = ""
+	_set_spin_interactions_enabled(false)
 	_refresh_spin_button()
 
 	var strip: Control = selector.call("get_active_reel_strip")
 	var pool_icons: Array[Texture2D] = []
-	for symbol in _selected_machine.symbols:
+	for symbol in spun_machine.symbols:
 		pool_icons.append(symbol.icon)
 
-	var speed_multiplier := MetropolisEconomy.get_spin_speed_multiplier(_selected_machine.machine_id)
+	var speed_multiplier := MetropolisEconomy.get_spin_speed_multiplier(spun_machine.machine_id)
 	var total_duration: float = AudioFx.get_spin_duration_for_multiplier(speed_multiplier)
 	var blink_duration: float = strip.call("get_blink_duration")
 	var reel_duration := maxf(total_duration - blink_duration, MIN_REEL_DURATION)
@@ -270,11 +277,11 @@ func _on_spin_pressed() -> void:
 	selector.call("play_spin_flourish", reel_duration)
 
 	var tiers: Array = outcome.get("tiers", [])
+	var final_symbols: Array = outcome.get("symbols", [])
 	if tiers.is_empty():
-		var idle_row: Array = outcome.get("symbols", [])
 		strip.call(
-			"play_spin", _icons_for_row(idle_row), pool_icons, reel_duration,
-			GameState.reduced_motion, _superposition_flags_for_row(idle_row)
+			"play_spin", _icons_for_row(final_symbols), pool_icons, reel_duration,
+			GameState.reduced_motion, _superposition_flags_for_row(final_symbols)
 		)
 		await get_tree().create_timer(total_duration).timeout
 	else:
@@ -293,18 +300,24 @@ func _on_spin_pressed() -> void:
 					GameState.reduced_motion, _superposition_flags_for_row(tier_row)
 				)
 				await get_tree().create_timer(total_duration).timeout
-			else:
-				strip.call("set_idle_symbols", row_icons)
-				await get_tree().create_timer(CASCADE_TIER_REVEAL_DELAY).timeout
 			var tier_payout := int(tier.get("payout", 0))
 			if tier_payout > 0:
 				payout_label.text = "TIER %d +$%d" % [tier_index + 1, tier_payout]
+			var next_row: Array = (
+				tiers[tier_index + 1].get("row", [])
+				if tier_index + 1 < tiers.size()
+				else final_symbols
+			)
+			await strip.call(
+				"play_cascade_refill", _icons_for_row(next_row), GameState.reduced_motion
+			)
+			if not GameState.reduced_motion:
+				await get_tree().create_timer(CASCADE_TIER_REVEAL_DELAY).timeout
 
 	AudioFx.stop_spin()
 	if not is_inside_tree():
 		return
 
-	var final_symbols: Array = outcome.get("symbols", [])
 	var names: Array[String] = []
 	for symbol in final_symbols:
 		if symbol != null:
@@ -323,15 +336,24 @@ func _on_spin_pressed() -> void:
 	)
 	if not is_inside_tree():
 		return
-	MetropolisEconomy.award_machine_spin(_selected_machine, outcome)
+	var awarded_payout := MetropolisEconomy.award_machine_spin(spun_machine, outcome)
 	_spin_in_progress = false
 	_hack_target_reel_index = -1
 	_surge_locked = false
 	_surge_rerolls_used = 0
 	_roll_surge_value()
+	_set_spin_interactions_enabled(true)
 	_refresh_surge_panel()
 	_refresh_hack_panel()
 	_refresh_spin_button()
+	spin_completed.emit(spun_machine.machine_id, awarded_payout)
+
+
+func _set_spin_interactions_enabled(enabled: bool) -> void:
+	ticket_shop.call("set_purchase_enabled", enabled)
+	selector.call("set_controls_enabled", enabled)
+	hud.call("set_controls_enabled", enabled)
+	hud.call("set_upgrades_enabled", enabled)
 
 
 func _icons_for_row(row: Array) -> Array[Texture2D]:

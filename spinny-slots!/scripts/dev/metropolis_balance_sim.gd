@@ -16,6 +16,7 @@ const MACHINES: Array[MetropolisMachineDefinition] = [
 	preload("res://resources/machines/quantum_vault.tres"),
 ]
 const SECONDS_PER_SPIN := 2.2
+const SIMULATION_SEED := 20260720
 
 var _spins := 120000
 
@@ -31,7 +32,7 @@ func _run() -> void:
 
 	var luck_config := MetropolisEconomy.get_upgrade_config(&"luck")
 	var coin_config := MetropolisEconomy.get_upgrade_config(&"coin_multiplier")
-	print("=== Metropolis balance simulation: %d spins/machine ===" % _spins)
+	print("=== Metropolis balance simulation: %d spins/machine, seed %d ===" % [_spins, SIMULATION_SEED])
 	print("Coin Multiplier: +%.0f%%/level, cap %d  |  Luck: +%.0f%%/level, cap %d\n" % [
 		coin_config.effect_per_level * 100.0, coin_config.max_level,
 		luck_config.effect_per_level * 100.0, luck_config.max_level,
@@ -62,6 +63,7 @@ func _run() -> void:
 		print("  Luck Lv %d (x%.2f) + Coin Lv 8: RTP %.1f%%" % [
 			luck_config.max_level, luck_max_mult, float(maxed["rtp"]) * 100.0,
 		])
+		_report_mechanic_scenario(machine)
 
 		_report_pacing(machine, coin_config, baseline_rtp, baseline["avg"], next_ticket)
 		print("")
@@ -69,10 +71,17 @@ func _run() -> void:
 	get_tree().quit(0)
 
 
-func _measure(machine: MetropolisMachineDefinition, luck_mult: float, coin_mult: float) -> Dictionary:
+func _measure(
+	machine: MetropolisMachineDefinition,
+	luck_mult: float,
+	coin_mult: float,
+	extra_options: Dictionary = {}
+) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
-	rng.seed = 20260720
-	var options := {"luck_multiplier": luck_mult, "coin_multiplier": coin_mult}
+	rng.seed = SIMULATION_SEED
+	var options := extra_options.duplicate()
+	options["luck_multiplier"] = luck_mult
+	options["coin_multiplier"] = coin_mult
 	var total := 0.0
 	var best := 0
 	for _spin_index in range(_spins):
@@ -83,6 +92,20 @@ func _measure(machine: MetropolisMachineDefinition, luck_mult: float, coin_mult:
 			best = payout
 	var avg := total / float(_spins)
 	return {"avg": avg, "rtp": avg / float(machine.ticket_price), "best": best}
+
+
+func _report_mechanic_scenario(machine: MetropolisMachineDefinition) -> void:
+	match machine.get_mechanic_kind():
+		MetropolisMechanicConfig.Kind.SURGE_MULTIPLIER:
+			var surged := _measure(machine, 1.0, 1.0, {"surge_multiplier": 3.0})
+			print("  mechanic: locked Surge x3 -> RTP %.1f%%" % (float(surged["rtp"]) * 100.0))
+		MetropolisMechanicConfig.Kind.HACK_CHARGE:
+			var hacked := _measure(machine, 1.0, 1.0, {"spend_hack_charge_on_reel_index": 0})
+			print("  mechanic: Hack Charge on reel 1 -> RTP %.1f%%" % (float(hacked["rtp"]) * 100.0))
+		MetropolisMechanicConfig.Kind.CASCADE_MATCH:
+			print("  mechanic: baseline includes the full precomputed Cascade chain")
+		MetropolisMechanicConfig.Kind.SUPERPOSITION:
+			print("  mechanic: Superposition is presentation-only; RTP unchanged")
 
 
 func _report_pacing(

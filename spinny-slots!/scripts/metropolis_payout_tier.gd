@@ -3,9 +3,8 @@ extends Resource
 
 ## One symbol tier's payout curve for a Metropolis machine. 3-reel machines
 ## only ever populate the "3" entry (3-of-a-kind is the only win shape);
-## 5-reel machines populate "3", "4", and "5" for their count-based paytable.
-## Keeping this as a sparse dictionary lets one resource type serve both
-## reel counts without an unused-field split between machine shapes.
+## Wider machines populate each paying count through their configured reel
+## count. Keeping this sparse lets one resource type serve all machine shapes.
 
 @export var tier: MetropolisSymbol.Tier = MetropolisSymbol.Tier.COMMON
 ## Keys are match counts as strings ("3", "4", "5"); values are the coin

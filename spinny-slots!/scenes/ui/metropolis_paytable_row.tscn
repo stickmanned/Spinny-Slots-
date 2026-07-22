@@ -29,6 +29,7 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 text = "Symbol"
 vertical_alignment = 1
+text_overrun_behavior = 3
 
 [node name="PercentLabel" type="Label" parent="TopRow"]
 unique_name_in_owner = true

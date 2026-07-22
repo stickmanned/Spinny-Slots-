@@ -40,6 +40,10 @@ func get_blink_duration() -> float:
 	return BLINK_COUNT * 2.0 * BLINK_INTERVAL
 
 
+func get_reel_count() -> int:
+	return _icons.size()
+
+
 func set_static_icon(icon: Texture2D) -> void:
 	for reel_icon in _icons:
 		reel_icon.texture = icon
@@ -51,6 +55,34 @@ func set_idle_symbols(icons: Array[Texture2D]) -> void:
 	for index in range(_icons.size()):
 		_icons[index].texture = icons[index % icons.size()]
 		_icons[index].modulate.a = 1.0
+		_icons[index].scale = Vector2.ONE
+
+
+## Presentation-only clear/refill beat for Skyline's already-computed cascade
+## rows. The economy supplies the next row; this method never rolls symbols.
+func play_cascade_refill(result_icons: Array[Texture2D], reduced_motion: bool = false) -> void:
+	if result_icons.is_empty() or _icons.is_empty():
+		return
+	_clear_superposition()
+	if reduced_motion:
+		set_idle_symbols(result_icons)
+		return
+	var clear_tween := create_tween().set_parallel()
+	clear_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	for reel_icon in _icons:
+		reel_icon.pivot_offset = reel_icon.size * 0.5
+		clear_tween.tween_property(reel_icon, "modulate:a", 0.0, 0.12)
+		clear_tween.tween_property(reel_icon, "scale", Vector2.ONE * 0.72, 0.12)
+	await clear_tween.finished
+	for index in range(_icons.size()):
+		_icons[index].texture = result_icons[index % result_icons.size()]
+		_icons[index].scale = Vector2.ONE * 1.18
+	var refill_tween := create_tween().set_parallel()
+	refill_tween.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	for reel_icon in _icons:
+		refill_tween.tween_property(reel_icon, "modulate:a", 1.0, 0.18)
+		refill_tween.tween_property(reel_icon, "scale", Vector2.ONE, 0.18)
+	await refill_tween.finished
 
 
 ## superposition_flags marks reels whose predetermined result is the
@@ -160,7 +192,7 @@ func _layout_windows() -> void:
 	var count := _windows.size()
 	# Inset the reels from all four edges of the screen region so no icon ever
 	# sits flush against (or past) the cabinet screen border, on both the
-	# 3-reel and 5-reel strips.
+	# 3-, 4-, and 5-reel strips.
 	var side_pad := size.x * 0.05
 	var vertical_pad := size.y * 0.08
 	var usable_width := maxf(size.x - side_pad * 2.0, 0.0)
@@ -176,3 +208,4 @@ func _layout_windows() -> void:
 		var reel_icon := _icons[index]
 		reel_icon.size = window.size * ICON_OVERSCAN_SCALE
 		reel_icon.position = (window.size - reel_icon.size) * 0.5
+		reel_icon.pivot_offset = reel_icon.size * 0.5

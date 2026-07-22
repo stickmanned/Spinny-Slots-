@@ -5,7 +5,7 @@
 
 [node name="TicketShopPanel" type="PanelContainer"]
 custom_minimum_size = Vector2(292, 178)
-clip_contents = false
+clip_contents = true
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
@@ -35,7 +35,7 @@ vertical_alignment = 1
 [node name="TicketScroll" type="ScrollContainer" parent="Content"]
 layout_mode = 2
 size_flags_vertical = 3
-clip_contents = false
+clip_contents = true
 horizontal_scroll_mode = 0
 
 [node name="TicketRows" type="VBoxContainer" parent="Content/TicketScroll"]

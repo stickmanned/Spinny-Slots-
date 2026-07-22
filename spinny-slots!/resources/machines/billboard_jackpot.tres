@@ -64,36 +64,32 @@ weight = 7.0
 script = ExtResource("5_tier")
 tier = 0
 payouts_by_count = {
-"3": 385000,
-"4": 1550000,
-"5": 7700000
+"3": 1540000,
+"4": 6200000
 }
 
 [sub_resource type="Resource" id="Tier_uncommon"]
 script = ExtResource("5_tier")
 tier = 1
 payouts_by_count = {
-"3": 1030000,
-"4": 4100000,
-"5": 20500000
+"3": 4120000,
+"4": 16400000
 }
 
 [sub_resource type="Resource" id="Tier_rare"]
 script = ExtResource("5_tier")
 tier = 2
 payouts_by_count = {
-"3": 2570000,
-"4": 10300000,
-"5": 51000000
+"3": 10280000,
+"4": 41200000
 }
 
 [sub_resource type="Resource" id="Tier_jackpot"]
 script = ExtResource("5_tier")
 tier = 3
 payouts_by_count = {
-"3": 7700000,
-"4": 31000000,
-"5": 154000000
+"3": 30800000,
+"4": 124000000
 }
 
 [sub_resource type="Resource" id="Mechanic_cascade"]
@@ -110,7 +106,7 @@ display_name = "Skyline Billboard Jackpot"
 ticket_price = 1000000
 ticket_texture = SubResource("Atlas_ticket")
 cabinet_texture = SubResource("Atlas_cabinet")
-reel_count = 5
+reel_count = 4
 symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_bulb"), SubResource("Symbol_ticket_stub"), SubResource("Symbol_spotlight"), SubResource("Symbol_golden_star"), SubResource("Symbol_neon_sign_burst")])
 payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
 screen_region = Rect2(260, 440, 680, 360)

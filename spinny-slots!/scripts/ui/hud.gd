@@ -29,6 +29,7 @@ var _currency_tween: Tween
 var _upgrade_tween: Tween
 var _coin_pulse_tween: Tween
 var _upgrades_enabled := true
+var _current_map_id: String = MapConfig.JUNKYARD_ID
 ## Source for the upgrade panel. Defaults to Economy (Junkyard's global
 ## tracks); metropolis_job swaps in a per-machine provider when its selected
 ## machine changes.
@@ -244,6 +245,17 @@ func set_area_name(area_name: String) -> void:
 	area_label.text = area_name
 
 
+## The active area is hosted below main.tscn, so SceneTree.current_scene is
+## always Main and cannot identify which map is being presented. Area scenes
+## set this explicit ID once during their own _ready() instead.
+func set_current_map_id(map_id: String) -> void:
+	_current_map_id = map_id
+
+
+func get_current_map_id() -> String:
+	return _current_map_id
+
+
 func show_settings_button() -> void:
 	settings_button.visible = true
 	map_button.visible = true
@@ -303,17 +315,10 @@ func _populate_map_cards() -> void:
 	for child in map_cards_container.get_children():
 		child.queue_free()
 	
-	var current_scene_name = get_tree().current_scene.scene_file_path.get_file().get_basename()
-	var current_map_id = "junkyard" # default
-	if current_scene_name == "metropolis_job":
-		current_map_id = "metropolis"
-	elif current_scene_name == "junkyard_job":
-		current_map_id = "junkyard"
-	
 	for map_config in MapConfig.get_maps():
 		var card = MAP_SELECT_CARD_SCENE.instantiate()
 		map_cards_container.add_child(card)
-		card.configure(map_config, current_map_id)
+		card.configure(map_config, _current_map_id)
 		card.map_selected.connect(_on_map_selected)
 		
 	# Focus the first enabled map card that is unlocked and not current, if any. Otherwise close button has focus

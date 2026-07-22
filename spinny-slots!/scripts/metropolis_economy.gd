@@ -3,7 +3,8 @@ extends Node
 ## Metropolis's spin-resolution engine. Deliberately separate from Economy:
 ## Junkyard pays the sum of each independently-rolled symbol's flat payout
 ## (no matching required), while Metropolis is a real slot machine — 3-of-3
-## or 3/4/5-of-5 count-based matches against a per-tier paytable. Follows the
+## or count-based matches on 4- and 5-reel machines against a per-tier
+## paytable. Follows the
 ## same outcome pipeline as Economy: every reel's result (and every mechanic
 ## effect layered on top of it) is fully computed here before any animation
 ## plays; GameState is only mutated by prepare_machine_spin (ticket/charge
@@ -183,8 +184,8 @@ func roll_reels(
 	return symbols
 
 
-## 3-reel machines only ever pay exact 3-of-3; 5-reel machines pay any
-## symbol that hits 3-or-more-of-5 (non-contiguous positions).
+## 3-reel machines only ever pay exact 3-of-3; wider machines pay any symbol
+## that hits 3 or more times (non-contiguous positions).
 func evaluate_matches(
 	machine: MetropolisMachineDefinition, symbols: Array[MetropolisSymbol]
 ) -> Array[Dictionary]:
@@ -410,6 +411,9 @@ func _resolve_cascade(
 		if mechanic.cascade_jackpot_grants_bonus_tier and jackpot_seen:
 			effective_cap += 1
 		if tier_index >= effective_cap:
+			# Clear and refill the final paid match for presentation, but do not
+			# evaluate another paying tier after the configured cap.
+			current_row = _refill_row(machine, rng, current_row, matches, luck_multiplier)
 			break
 		current_row = _refill_row(machine, rng, current_row, matches, luck_multiplier)
 	return {"tiers": tiers, "final_row": current_row}

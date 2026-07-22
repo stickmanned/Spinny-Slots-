@@ -94,6 +94,12 @@ Invoke-Checked -Executable $godot -Description 'Running the Metropolis paytable,
     'res://scenes/dev/metropolis_milestone_test.tscn'
 )
 
+Invoke-Checked -Executable $godot -Description 'Running the Metropolis map, clipped UI, stable layout, 4-reel, real spin, and mechanic-control checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/metropolis_stabilization_test.tscn'
+)
+
 if ($Export) {
     $buildDirectory = Join-Path $projectRoot 'builds'
     New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null

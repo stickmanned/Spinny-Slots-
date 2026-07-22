@@ -88,7 +88,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="LeftColumn" type="VBoxContainer" parent="LeftColumnLayer/Overlay"]
+[node name="LeftColumn" type="Control" parent="LeftColumnLayer/Overlay"]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -97,17 +97,24 @@ offset_top = 174.0
 offset_right = 316.0
 offset_bottom = -24.0
 grow_vertical = 2
-theme_override_constants/separation = 16
 
 [node name="TicketShopPanel" parent="LeftColumnLayer/Overlay/LeftColumn" instance=ExtResource("4_ticket_shop")]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 330.0
+grow_horizontal = 2
 
 [node name="PaytablePanel" parent="LeftColumnLayer/Overlay/LeftColumn" instance=ExtResource("5_paytable")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 180)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 342.0
+offset_bottom = 522.0
+grow_horizontal = 2
 
 [node name="SelectorLayer" type="CanvasLayer" parent="."]
 layer = 17
@@ -122,34 +129,51 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="MachineArea" type="VBoxContainer" parent="SelectorLayer/Overlay"]
+[node name="MachineArea" type="Control" parent="SelectorLayer/Overlay"]
 layout_mode = 1
 anchors_preset = 13
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -314.0
-offset_top = 42.0
+offset_top = 24.0
 offset_right = 314.0
-offset_bottom = -18.0
+offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 4
 
 [node name="MachineSelectorPanel" parent="SelectorLayer/Overlay/MachineArea" instance=ExtResource("6_selector")]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 480.0
+grow_horizontal = 2
 
-[node name="SurgePanel" type="HBoxContainer" parent="SelectorLayer/Overlay/MachineArea"]
+[node name="MechanicRegion" type="Control" parent="SelectorLayer/Overlay/MachineArea"]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 482.0
+offset_bottom = 542.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="SurgePanel" type="HBoxContainer" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
 theme_override_constants/separation = 12
 visible = false
 
-[node name="SurgeValueLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea/SurgePanel"]
+[node name="SurgeValueLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/SurgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
@@ -159,25 +183,30 @@ theme_override_font_sizes/font_size = 20
 text = "Surge x1"
 vertical_alignment = 1
 
-[node name="SurgeLockButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/SurgePanel"]
+[node name="SurgeLockButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/SurgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_default_cursor_shape = 2
 text = "LOCK"
 
-[node name="SurgeRerollButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/SurgePanel"]
+[node name="SurgeRerollButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/SurgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_default_cursor_shape = 2
 text = "REROLL"
 
-[node name="HackPanel" type="VBoxContainer" parent="SelectorLayer/Overlay/MachineArea"]
+[node name="HackPanel" type="VBoxContainer" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion"]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 6
 visible = false
 
-[node name="HackChargeLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea/HackPanel"]
+[node name="HackChargeLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/HackPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.95, 0.55, 1)
@@ -187,7 +216,7 @@ theme_override_font_sizes/font_size = 18
 text = "Hack Charges: 0/3"
 horizontal_alignment = 1
 
-[node name="HackReelButtons" type="HBoxContainer" parent="SelectorLayer/Overlay/MachineArea/HackPanel"]
+[node name="HackReelButtons" type="HBoxContainer" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/HackPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 alignment = 1
@@ -195,24 +224,28 @@ theme_override_constants/separation = 8
 
 [node name="ResultLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea"]
 unique_name_in_owner = true
-modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 544.0
+offset_bottom = 564.0
+grow_horizontal = 2
 theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="SpacerTop" type="Control" parent="SelectorLayer/Overlay/MachineArea"]
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
-
 [node name="PayoutLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 566.0
+offset_bottom = 608.0
+grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
 theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
 theme_override_constants/outline_size = 9
@@ -222,17 +255,18 @@ horizontal_alignment = 1
 [node name="SpinButton" type="Button" parent="SelectorLayer/Overlay/MachineArea"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(276, 64)
-layout_mode = 2
-size_flags_horizontal = 4
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -138.0
+offset_top = 614.0
+offset_right = 138.0
+offset_bottom = 678.0
+grow_horizontal = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 34
 text = "SPIN"
-
-[node name="SpacerBottom" type="Control" parent="SelectorLayer/Overlay/MachineArea"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 4.0
-mouse_filter = 2
 
 [node name="PhoneNotification" parent="." instance=ExtResource("10_phone")]
 unique_name_in_owner = true

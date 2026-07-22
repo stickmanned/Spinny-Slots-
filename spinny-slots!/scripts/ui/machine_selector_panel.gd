@@ -10,16 +10,18 @@ signal selection_changed(machine)
 @onready var left_arrow: BaseButton = %LeftArrow
 @onready var right_arrow: BaseButton = %RightArrow
 @onready var cabinet_art: TextureRect = %CabinetArt
-## The 3-window strip Junkyard always uses. Metropolis's 5-reel machines use
-## reel_strip_5 instead; both live in the scene so ownership/unique-name
-## registration happens through normal scene loading, not runtime swapping.
+## The 3-window strip Junkyard always uses. Metropolis selects the 4- or
+## 5-window strip for its wider machines; all three live in the scene so
+## ownership/unique-name registration happens through normal scene loading.
 @onready var reel_strip: Control = %ReelStrip
+@onready var reel_strip_4: Control = %ReelStrip4
 @onready var reel_strip_5: Control = %ReelStrip5
 @onready var machine_name: Label = %MachineName
 @onready var select_button: Button = %SelectButton
 
 var _machines: Array = []
 var _selected_index := 0
+var _controls_enabled := true
 
 
 func _ready() -> void:
@@ -38,7 +40,13 @@ func _ready() -> void:
 ## %ReelStrip unique name, which stays reserved for Junkyard's always-3-reel
 ## direct lookup so its existing behavior never changes.
 func get_active_reel_strip() -> Control:
-	return reel_strip_5 if _get_reel_count(get_selected_machine()) == 5 else reel_strip
+	match _get_reel_count(get_selected_machine()):
+		4:
+			return reel_strip_4
+		5:
+			return reel_strip_5
+		_:
+			return reel_strip
 
 
 func configure(machines: Array, selected_machine_id: StringName = &"") -> void:
@@ -54,6 +62,11 @@ func configure(machines: Array, selected_machine_id: StringName = &"") -> void:
 
 func set_select_button_visible(is_visible: bool) -> void:
 	select_button.visible = is_visible
+
+
+func set_controls_enabled(enabled: bool) -> void:
+	_controls_enabled = enabled
+	_refresh_control_state()
 
 
 func get_selected_machine():
@@ -90,22 +103,27 @@ func _select_current() -> void:
 
 
 func _refresh() -> void:
-	var has_multiple := _machines.size() > 1
-	left_arrow.disabled = not has_multiple
-	right_arrow.disabled = not has_multiple
-	left_arrow.modulate.a = 1.0 if has_multiple else 0.72
-	right_arrow.modulate.a = 1.0 if has_multiple else 0.72
-	select_button.disabled = _machines.is_empty()
+	_refresh_control_state()
 	var machine = get_selected_machine()
 	if machine == null:
 		cabinet_art.texture = null
 		machine_name.text = "No machines"
 		reel_strip.visible = false
+		reel_strip_4.visible = false
 		reel_strip_5.visible = false
 		return
 	cabinet_art.texture = machine.cabinet_texture
 	machine_name.text = machine.display_name
 	_position_reel_strip()
+
+
+func _refresh_control_state() -> void:
+	var has_multiple := _machines.size() > 1
+	left_arrow.disabled = not _controls_enabled or not has_multiple
+	right_arrow.disabled = not _controls_enabled or not has_multiple
+	left_arrow.modulate.a = 1.0 if _controls_enabled and has_multiple else 0.72
+	right_arrow.modulate.a = 1.0 if _controls_enabled and has_multiple else 0.72
+	select_button.disabled = not _controls_enabled or _machines.is_empty()
 
 
 ## Duck-typed: MachineDefinition (Junkyard) never declares reel_count, so this
@@ -120,8 +138,8 @@ func _get_reel_count(machine) -> int:
 func _position_reel_strip() -> void:
 	var machine = get_selected_machine()
 	var active_strip := get_active_reel_strip()
-	var inactive_strip := reel_strip_5 if active_strip == reel_strip else reel_strip
-	inactive_strip.visible = false
+	for strip in [reel_strip, reel_strip_4, reel_strip_5]:
+		strip.visible = strip == active_strip
 	if machine == null or cabinet_art.texture == null or not machine.screen_region.has_area():
 		active_strip.visible = false
 		return

@@ -66,11 +66,11 @@ func _update_name_font_size() -> void:
 	if machine_name == null or _machine == null:
 		return
 	var text_len: int = _machine.display_name.length()
-	var font_size := 15
-	if text_len > 16:
+	var font_size := 13
+	if text_len > 20:
 		font_size = 11
-	elif text_len > 11:
-		font_size = 13
+	elif text_len > 15:
+		font_size = 12
 	machine_name.add_theme_font_size_override("font_size", font_size)
 
 

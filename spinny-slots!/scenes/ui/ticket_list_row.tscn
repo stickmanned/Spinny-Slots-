@@ -16,10 +16,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 10.0
-offset_right = -12.0
-offset_bottom = -10.0
+offset_left = 10.0
+offset_top = 8.0
+offset_right = -10.0
+offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -27,7 +27,7 @@ mouse_filter = 2
 [node name="Content" type="HBoxContainer" parent="ContentMargin"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="TicketArt" type="TextureRect" parent="ContentMargin/Content"]
 unique_name_in_owner = true
@@ -47,16 +47,23 @@ theme_override_constants/separation = 1
 
 [node name="MachineName" type="Label" parent="ContentMargin/Content/TicketDetails"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 13
 text = "Machine"
 vertical_alignment = 1
+autowrap_mode = 2
+clip_text = true
+max_lines_visible = 2
 
 [node name="PriceLabel" type="Label" parent="ContentMargin/Content/TicketDetails"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
 theme_override_font_sizes/font_size = 15
 text = "$0"
+text_overrun_behavior = 3
