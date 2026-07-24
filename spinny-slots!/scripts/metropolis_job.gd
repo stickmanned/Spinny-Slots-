@@ -21,6 +21,16 @@ const LEFT_PANEL_GAP := 16.0
 # icon is visually identical across both areas.
 const PHONE_BASE_TEXTURE: Texture2D = preload("res://resources/gadgets/Cell Phone.png")
 const PHONE_ATLAS_REGION := Rect2(710, 480, 610, 990)
+# The welcome call reuses the Junkyard Rich Kid's exact name, portrait, and
+# phone-call dialogue presentation — no separate Metropolis rival exists yet.
+const JUNKYARD_PROGRESSION: JunkyardProgressionConfig = preload("res://resources/story/junkyard_progression.tres")
+const METROPOLIS_WELCOME_CALL: DialogueData = preload("res://resources/dialogue/metropolis_welcome_call.tres")
+const CALL_DIM_ALPHA := 0.55
+const CALL_DIM_DURATION := 0.25
+const CALL_FADE_OUT_DURATION := 0.22
+
+enum Phase { NORMAL, WELCOME_CALL }
+
 @onready var hud: CanvasLayer = %Hud
 @onready var left_column: Control = %LeftColumn
 @onready var ticket_shop: PanelContainer = %TicketShopPanel
@@ -37,12 +47,16 @@ const PHONE_ATLAS_REGION := Rect2(710, 480, 610, 990)
 @onready var hack_panel: Control = %HackPanel
 @onready var hack_charge_label: Label = %HackChargeLabel
 @onready var hack_reel_buttons: HBoxContainer = %HackReelButtons
+@onready var dialogue_box: CanvasLayer = %DialogueBox
+@onready var call_dim: ColorRect = %CallDim
 
 var _selected_machine: MetropolisMachineDefinition
 var _spin_in_progress := false
 var _surge_current_value := 1.0
 var _surge_rerolls_used := 0
 var _hack_target_reel_index := -1
+var _phase := Phase.NORMAL
+var _call_tween: Tween
 
 
 func _ready() -> void:
@@ -61,6 +75,8 @@ func _ready() -> void:
 	coin_collection_effect.balance_progressed.connect(Callable(hud, "set_presented_money"))
 	coin_collection_effect.balance_pulse_requested.connect(Callable(hud, "pulse_coin_balance"))
 	coin_collection_effect.coin_sound_requested.connect(AudioFx.play_coin_drop)
+	dialogue_box.connect("finished", _on_welcome_call_finished)
+	phone_notification.connect("activated", _on_phone_activated)
 
 	selector.call("configure", MACHINES, GameState.selected_machine_id)
 	ticket_shop.call("configure_machines", MACHINES, GameState.selected_machine_id)
@@ -71,9 +87,7 @@ func _ready() -> void:
 	hud.call("set_area_name", "METROPOLIS")
 	hud.call("set_current_map_id", MapConfig.METROPOLIS_ID)
 	ticket_shop.call("set_extension_mode", true)
-	# No Metropolis rival/boss is defined yet, so the phone shows only its
-	# idle icon — the "incoming call" boss trigger is intentionally not wired.
-	phone_notification.call("show_idle", _build_phone_texture())
+	_show_initial_phone_state()
 	_refresh_for_selected_machine()
 	_queue_left_column_layout()
 
@@ -104,6 +118,74 @@ func _build_phone_texture() -> Texture2D:
 	return atlas
 
 
+## Shows the one-time welcome call as an incoming-call notification on first
+## Metropolis entry, or the idle phone once it has been completed. Every
+## re-entry before completion offers it again so an interrupted call is never
+## silently lost; only the very first offer plays the attention-grabbing pop.
+func _show_initial_phone_state() -> void:
+	if GameState.metropolis_unlocked and not GameState.metropolis_welcome_call_completed:
+		var animate_pop := not GameState.metropolis_welcome_notification_received
+		GameState.mark_metropolis_welcome_notification_received()
+		phone_notification.call("show_notification", _build_phone_texture(), GameState.reduced_motion, animate_pop)
+	else:
+		phone_notification.call("show_idle", _build_phone_texture())
+
+
+func _on_phone_activated() -> void:
+	if _phase != Phase.NORMAL or GameState.metropolis_welcome_call_completed:
+		return
+	_begin_welcome_call()
+
+
+func _begin_welcome_call() -> void:
+	_phase = Phase.WELCOME_CALL
+	GameState.mark_metropolis_welcome_call_started()
+	phone_notification.call("hide_notification")
+	_set_spin_interactions_enabled(false)
+	_refresh_spin_button()
+	_refresh_surge_panel()
+	_refresh_hack_panel()
+	call_dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	dialogue_box.call(
+		"use_phone_call_layout",
+		JUNKYARD_PROGRESSION.phone_call_speaker,
+		JUNKYARD_PROGRESSION.rich_kid_portrait
+	)
+	call_dim.color.a = 0.0
+	if _call_tween and _call_tween.is_valid():
+		_call_tween.kill()
+	_call_tween = create_tween()
+	_call_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_call_tween.tween_property(call_dim, "color:a", CALL_DIM_ALPHA, CALL_DIM_DURATION)
+	_call_tween.tween_callback(func() -> void:
+		dialogue_box.call("play", METROPOLIS_WELCOME_CALL.lines)
+	)
+
+
+func _on_welcome_call_finished() -> void:
+	if _phase != Phase.WELCOME_CALL:
+		return
+	dialogue_box.call("fade_out", CALL_FADE_OUT_DURATION)
+	if _call_tween and _call_tween.is_valid():
+		_call_tween.kill()
+	_call_tween = create_tween()
+	_call_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_call_tween.tween_property(call_dim, "color:a", 0.0, CALL_DIM_DURATION)
+	_call_tween.tween_callback(_finish_welcome_call)
+
+
+func _finish_welcome_call() -> void:
+	GameState.mark_metropolis_welcome_call_completed()
+	call_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dialogue_box.call("use_standard_layout")
+	_phase = Phase.NORMAL
+	_set_spin_interactions_enabled(true)
+	_refresh_spin_button()
+	_refresh_surge_panel()
+	_refresh_hack_panel()
+	phone_notification.call("show_idle", _build_phone_texture())
+
+
 func _on_money_changed(_value: int) -> void:
 	ticket_shop.call("refresh")
 
@@ -124,6 +206,8 @@ func _on_free_rerolls_changed(machine_id: StringName, _count: int) -> void:
 
 
 func _on_purchase_requested(machine) -> void:
+	if _phase != Phase.NORMAL:
+		return
 	if not MetropolisEconomy.purchase_ticket(machine):
 		ticket_shop.call("refresh")
 		return
@@ -131,11 +215,15 @@ func _on_purchase_requested(machine) -> void:
 
 
 func _on_ticket_machine_selected(machine) -> void:
+	if _phase != Phase.NORMAL:
+		return
 	selector.call("configure", MACHINES, machine.machine_id)
 	_set_selected_machine(machine)
 
 
 func _on_selection_changed(machine) -> void:
+	if _phase != Phase.NORMAL:
+		return
 	_set_selected_machine(machine)
 
 
@@ -193,7 +281,7 @@ func _refresh_surge_panel() -> void:
 	var free_rerolls := GameState.get_machine_free_rerolls(_selected_machine.machine_id)
 	var rerolls_left := _selected_machine.mechanic.surge_max_rerolls_per_spin - _surge_rerolls_used
 	var can_afford_reroll := free_rerolls > 0 or Economy.can_afford(_selected_machine.mechanic.surge_reroll_cost)
-	surge_reroll_button.disabled = _spin_in_progress or rerolls_left <= 0 or not can_afford_reroll
+	surge_reroll_button.disabled = _spin_in_progress or _phase != Phase.NORMAL or rerolls_left <= 0 or not can_afford_reroll
 	surge_reroll_button.text = (
 		"REROLL (FREE TOKEN)"
 		if free_rerolls > 0
@@ -210,6 +298,8 @@ func _format_multiplier(value: float) -> String:
 
 
 func _on_surge_reroll_pressed() -> void:
+	if _phase != Phase.NORMAL:
+		return
 	var result := MetropolisEconomy.reroll_surge_multiplier_now(_selected_machine, _surge_rerolls_used)
 	if not bool(result.get("ok", false)):
 		return
@@ -232,12 +322,14 @@ func _refresh_hack_panel() -> void:
 		button.text = "Reel %d" % (reel_index + 1)
 		button.toggle_mode = true
 		button.button_pressed = reel_index == _hack_target_reel_index
-		button.disabled = _spin_in_progress or charges <= 0
+		button.disabled = _spin_in_progress or _phase != Phase.NORMAL or charges <= 0
 		button.pressed.connect(_on_hack_reel_button_pressed.bind(reel_index))
 		hack_reel_buttons.add_child(button)
 
 
 func _on_hack_reel_button_pressed(reel_index: int) -> void:
+	if _phase != Phase.NORMAL:
+		return
 	_hack_target_reel_index = -1 if _hack_target_reel_index == reel_index else reel_index
 	_refresh_hack_panel()
 
@@ -249,11 +341,11 @@ func _refresh_spin_button() -> void:
 		return
 	var ticket_count := GameState.get_machine_ticket_count(_selected_machine.machine_id)
 	spin_button.text = "SPIN (%d)" % ticket_count
-	spin_button.disabled = _spin_in_progress or ticket_count <= 0
+	spin_button.disabled = _spin_in_progress or _phase != Phase.NORMAL or ticket_count <= 0
 
 
 func _on_spin_pressed() -> void:
-	if _spin_in_progress or _selected_machine == null:
+	if _phase != Phase.NORMAL or _spin_in_progress or _selected_machine == null:
 		return
 	var spun_machine := _selected_machine
 

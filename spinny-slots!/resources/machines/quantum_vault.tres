@@ -18,7 +18,7 @@ region = Rect2(460, 300, 1120, 1400)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
-region = Rect2(160, 560, 1680, 880)
+region = Rect2(131, 566, 1738, 868)
 
 [sub_resource type="Resource" id="Symbol_quantum_particle"]
 script = ExtResource("4_symbol")

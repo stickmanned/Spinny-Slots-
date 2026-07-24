@@ -100,6 +100,12 @@ Invoke-Checked -Executable $godot -Description 'Running the Metropolis map, clip
     'res://scenes/dev/metropolis_stabilization_test.tscn'
 )
 
+Invoke-Checked -Executable $godot -Description 'Running the Metropolis welcome call trigger, persistence, control-lock, and layout checks' -Arguments @(
+    '--headless',
+    '--path', $projectRoot,
+    'res://scenes/dev/metropolis_welcome_call_test.tscn'
+)
+
 if ($Export) {
     $buildDirectory = Join-Path $projectRoot 'builds'
     New-Item -ItemType Directory -Force -Path $buildDirectory | Out-Null

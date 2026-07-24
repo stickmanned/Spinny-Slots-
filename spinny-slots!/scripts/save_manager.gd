@@ -204,6 +204,9 @@ func _capture_document() -> Dictionary:
 			"junk_king_available": GameState.junk_king_available,
 			"junk_king_defeated": GameState.junk_king_defeated,
 			"metropolis_unlocked": GameState.metropolis_unlocked,
+			"metropolis_welcome_notification_received": GameState.metropolis_welcome_notification_received,
+			"metropolis_welcome_call_started": GameState.metropolis_welcome_call_started,
+			"metropolis_welcome_call_completed": GameState.metropolis_welcome_call_completed,
 		},
 		"machines": {
 			"selected_machine_id": String(GameState.selected_machine_id),
@@ -286,6 +289,7 @@ func _uses_current_schema(raw: Dictionary) -> bool:
 		and story.has("junk_king_available")
 		and story.has("junk_king_defeated")
 		and story.has("metropolis_unlocked")
+		and story.has("metropolis_welcome_call_completed")
 		and not machines.has("machine_upgrade_levels")
 	)
 
@@ -325,6 +329,18 @@ func _normalize_document(raw: Dictionary) -> Dictionary:
 	)
 	var metropolis_unlocked := _read_bool_alias(
 		story, base, "metropolis_unlocked", "metropolisUnlocked", false
+	)
+	# Missing on any pre-existing save (including ones that already unlocked
+	# Metropolis) always defaults to false, so the welcome call is offered
+	# exactly once on that player's next Metropolis visit.
+	var metropolis_welcome_notification_received := _read_bool_alias(
+		story, base, "metropolis_welcome_notification_received", "metropolisWelcomeNotificationReceived", false
+	)
+	var metropolis_welcome_call_started := _read_bool_alias(
+		story, base, "metropolis_welcome_call_started", "metropolisWelcomeCallStarted", false
+	)
+	var metropolis_welcome_call_completed := _read_bool_alias(
+		story, base, "metropolis_welcome_call_completed", "metropolisWelcomeCallCompleted", false
 	)
 
 	if has_magnet_machine and not has_any_boss_key:
@@ -401,6 +417,9 @@ func _normalize_document(raw: Dictionary) -> Dictionary:
 			"junk_king_available": junk_king_available,
 			"junk_king_defeated": junk_king_defeated,
 			"metropolis_unlocked": metropolis_unlocked,
+			"metropolis_welcome_notification_received": metropolis_welcome_notification_received,
+			"metropolis_welcome_call_started": metropolis_welcome_call_started,
+			"metropolis_welcome_call_completed": metropolis_welcome_call_completed,
 		},
 		"machines": {
 			"selected_machine_id": selected_machine_id,
@@ -450,6 +469,11 @@ func _apply_document(document: Dictionary) -> void:
 	GameState.junk_king_available = bool(story.get("junk_king_available", false))
 	GameState.junk_king_defeated = bool(story.get("junk_king_defeated", false))
 	GameState.metropolis_unlocked = bool(story.get("metropolis_unlocked", false))
+	GameState.metropolis_welcome_notification_received = bool(
+		story.get("metropolis_welcome_notification_received", false)
+	)
+	GameState.metropolis_welcome_call_started = bool(story.get("metropolis_welcome_call_started", false))
+	GameState.metropolis_welcome_call_completed = bool(story.get("metropolis_welcome_call_completed", false))
 
 	GameState.unlocked_machine_ids.clear()
 	for machine_id in _sanitize_string_array(machines.get("unlocked_machine_ids", [])):

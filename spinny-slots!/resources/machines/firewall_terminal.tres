@@ -18,7 +18,7 @@ region = Rect2(500, 300, 1000, 1400)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
-region = Rect2(40, 600, 1920, 800)
+region = Rect2(13, 588, 1970, 815)
 
 [sub_resource type="Resource" id="Symbol_chip"]
 script = ExtResource("4_symbol")

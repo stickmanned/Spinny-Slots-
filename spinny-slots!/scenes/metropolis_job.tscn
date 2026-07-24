@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/metropolis_job.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://cc06geaag4tw5" path="res://resources/ui/main_theme.tres" id="2_theme"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/ui/confetti_effect.gd" id="8_confetti_effect"]
 [ext_resource type="PackedScene" uid="uid://cxbmrjnd5l2j8" path="res://scenes/ui/hud.tscn" id="9_hud"]
 [ext_resource type="PackedScene" uid="uid://debuf28yb71up" path="res://scenes/ui/phone_notification.tscn" id="10_phone"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_box.tscn" id="11_dialogue"]
 
 [node name="MetropolisJob" type="Control"]
 layout_mode = 3
@@ -242,4 +243,30 @@ theme_override_font_sizes/font_size = 34
 text = "SPIN"
 
 [node name="PhoneNotification" parent="." instance=ExtResource("10_phone")]
+unique_name_in_owner = true
+
+[node name="CallDimLayer" type="CanvasLayer" parent="."]
+layer = 25
+
+[node name="Overlay" type="Control" parent="CallDimLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CallDim" type="ColorRect" parent="CallDimLayer/Overlay"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="DialogueBox" parent="." instance=ExtResource("11_dialogue")]
 unique_name_in_owner = true

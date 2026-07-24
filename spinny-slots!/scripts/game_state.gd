@@ -118,6 +118,30 @@ var metropolis_unlocked := false:
 		metropolis_unlocked = value
 		story_progress_changed.emit()
 
+## Metropolis-only onboarding call. Kept separate from the Junkyard Rich Kid
+## and Junk King call flags so their progression never interferes with this
+## one-time welcome to the new area.
+var metropolis_welcome_notification_received := false:
+	set(value):
+		if metropolis_welcome_notification_received == value:
+			return
+		metropolis_welcome_notification_received = value
+		story_progress_changed.emit()
+
+var metropolis_welcome_call_started := false:
+	set(value):
+		if metropolis_welcome_call_started == value:
+			return
+		metropolis_welcome_call_started = value
+		story_progress_changed.emit()
+
+var metropolis_welcome_call_completed := false:
+	set(value):
+		if metropolis_welcome_call_completed == value:
+			return
+		metropolis_welcome_call_completed = value
+		story_progress_changed.emit()
+
 var selected_machine_id: StringName = &"":
 	set(value):
 		if selected_machine_id == value:
@@ -159,6 +183,9 @@ func reset_for_new_game() -> void:
 	junk_king_available = false
 	junk_king_defeated = false
 	metropolis_unlocked = false
+	metropolis_welcome_notification_received = false
+	metropolis_welcome_call_started = false
+	metropolis_welcome_call_completed = false
 	selected_machine_id = &""
 	unlocked_machine_ids.clear()
 	machine_ticket_counts.clear()
@@ -263,6 +290,26 @@ func mark_metropolis_unlocked() -> void:
 	if metropolis_unlocked:
 		return
 	metropolis_unlocked = true
+
+
+func mark_metropolis_welcome_notification_received() -> void:
+	if metropolis_welcome_notification_received:
+		return
+	metropolis_welcome_notification_received = true
+
+
+func mark_metropolis_welcome_call_started() -> void:
+	if metropolis_welcome_call_started:
+		return
+	metropolis_welcome_call_started = true
+
+
+func mark_metropolis_welcome_call_completed() -> void:
+	if metropolis_welcome_call_completed:
+		return
+	metropolis_welcome_notification_received = true
+	metropolis_welcome_call_started = true
+	metropolis_welcome_call_completed = true
 
 
 ## Returns a transient token for one boss attempt. Tokens are deliberately not

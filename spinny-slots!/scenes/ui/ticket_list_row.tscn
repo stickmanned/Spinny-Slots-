@@ -55,7 +55,8 @@ theme_override_font_sizes/font_size = 13
 text = "Machine"
 vertical_alignment = 1
 autowrap_mode = 2
-clip_text = true
+clip_text = false
+text_overrun_behavior = 3
 max_lines_visible = 2
 
 [node name="PriceLabel" type="Label" parent="ContentMargin/Content/TicketDetails"]
