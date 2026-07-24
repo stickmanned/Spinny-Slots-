@@ -25,6 +25,7 @@ const PHONE_ATLAS_REGION := Rect2(710, 480, 610, 990)
 # phone-call dialogue presentation — no separate Metropolis rival exists yet.
 const JUNKYARD_PROGRESSION: JunkyardProgressionConfig = preload("res://resources/story/junkyard_progression.tres")
 const METROPOLIS_WELCOME_CALL: DialogueData = preload("res://resources/dialogue/metropolis_welcome_call.tres")
+const MUSIC_PATH := "res://assets/music/Tix Blasterz.mp3"
 const CALL_DIM_ALPHA := 0.55
 const CALL_DIM_DURATION := 0.25
 const CALL_FADE_OUT_DURATION := 0.22
@@ -57,6 +58,7 @@ var _surge_rerolls_used := 0
 var _hack_target_reel_index := -1
 var _phase := Phase.NORMAL
 var _call_tween: Tween
+var _music_player: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -90,6 +92,37 @@ func _ready() -> void:
 	_show_initial_phone_state()
 	_refresh_for_selected_machine()
 	_queue_left_column_layout()
+	_play_music()
+
+
+func _exit_tree() -> void:
+	AudioFx.stop_spin()
+	if GameState.music_volume_changed.is_connected(_on_music_volume_changed):
+		GameState.music_volume_changed.disconnect(_on_music_volume_changed)
+	if _music_player != null:
+		_music_player.stop()
+		_music_player.stream = null
+
+
+func _play_music() -> void:
+	if DisplayServer.get_name() == "headless":
+		return
+	var stream := load(MUSIC_PATH) as AudioStreamMP3
+	if stream == null:
+		push_warning("Could not load Metropolis music: %s" % MUSIC_PATH)
+		return
+	stream.loop = true
+	_music_player = AudioStreamPlayer.new()
+	_music_player.stream = stream
+	_music_player.volume_db = linear_to_db(GameState.music_volume)
+	add_child(_music_player)
+	GameState.music_volume_changed.connect(_on_music_volume_changed)
+	_music_player.play()
+
+
+func _on_music_volume_changed(volume: float) -> void:
+	if _music_player != null:
+		_music_player.volume_db = linear_to_db(volume)
 
 
 func _queue_left_column_layout() -> void:

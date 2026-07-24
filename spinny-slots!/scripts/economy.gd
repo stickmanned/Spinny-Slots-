@@ -240,7 +240,6 @@ func get_upgrade_max_level(upgrade_id: StringName) -> int:
 		return config.max_level
 	return mini(config.max_level_before_metropolis, config.max_level)
 
-
 func get_upgrade_multiplier(upgrade_id: StringName) -> float:
 	var config := get_upgrade_config(upgrade_id)
 	if config == null:

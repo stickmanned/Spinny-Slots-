@@ -43,7 +43,8 @@ func _run() -> void:
 		print(
 			"Junk King feature checks passed: isolated max boss upgrades, shared seeded schedules, turn locks, "
 			+ "10-round scoring, power-up traces and charges, repeated sudden death, "
-			+ "idempotent outcomes, exact dialogue/assets, save migrations, Magnet trigger, confirmation, and layout."
+			+ "idempotent outcomes, exact dialogue/assets, delayed battle music, save migrations, "
+			+ "Magnet trigger, confirmation, and layout."
 		)
 		get_tree().quit(0)
 	else:
@@ -81,6 +82,10 @@ func _verify_battle_upgrade_ui() -> void:
 	battle.seed_override = 84001
 	add_child(battle)
 	await _frames(4)
+	_assert_true(
+		not bool(battle.get("_music_start_requested")),
+		"Junk King music stays silent while the player selects and reviews a loadout"
+	)
 	var player_panel := battle.get_node("%PlayerPanel") as BattleContestantPanel
 	var boss_panel := battle.get_node("%BossPanel") as BattleContestantPanel
 	_assert_true(
@@ -99,6 +104,10 @@ func _verify_battle_upgrade_ui() -> void:
 	)
 	var ui_loadout: Array[StringName] = [&"interference_shield", &"triple_welder", &"mixed_load_bonus"]
 	battle.call("_on_selection_confirmed", ui_loadout)
+	_assert_true(
+		bool(battle.get("_music_start_requested")),
+		"Junk King music starts when the reviewed loadout confirms the battle"
+	)
 	await _frames(5)
 	_assert_true(
 		(battle.get_node("%ActiveMachineLabel") as Label).text.contains("BOTH CONTESTANTS"),

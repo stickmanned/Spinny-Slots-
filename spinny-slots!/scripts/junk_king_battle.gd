@@ -27,6 +27,7 @@ const VICTORY_DIALOGUE: DialogueData = preload(
 const DEFEAT_DIALOGUE: DialogueData = preload(
 	"res://resources/dialogue/junk_king_defeat.tres"
 )
+const MUSIC_PATH := "res://assets/music/Powerplay.mp3"
 
 const MACHINE_REVEAL_DURATION := 0.18
 const BOSS_THINK_DURATION := 0.72
@@ -81,6 +82,8 @@ var _navigation_emitted := false
 var _permanent_resolution_attempted := false
 var _log_lines: Array[String] = []
 var _outcome_tween: Tween
+var _music_player: AudioStreamPlayer
+var _music_start_requested := false
 
 
 func _ready() -> void:
@@ -103,6 +106,35 @@ func _exit_tree() -> void:
 	if _outcome_tween != null and _outcome_tween.is_valid():
 		_outcome_tween.kill()
 	AudioFx.stop_spin()
+	if GameState.music_volume_changed.is_connected(_on_music_volume_changed):
+		GameState.music_volume_changed.disconnect(_on_music_volume_changed)
+	if _music_player != null:
+		_music_player.stop()
+		_music_player.stream = null
+
+
+func _play_music() -> void:
+	if _music_start_requested:
+		return
+	_music_start_requested = true
+	if DisplayServer.get_name() == "headless":
+		return
+	var stream := load(MUSIC_PATH) as AudioStreamMP3
+	if stream == null:
+		push_warning("Could not load Junk King battle music: %s" % MUSIC_PATH)
+		return
+	stream.loop = true
+	_music_player = AudioStreamPlayer.new()
+	_music_player.stream = stream
+	_music_player.volume_db = linear_to_db(GameState.music_volume)
+	add_child(_music_player)
+	GameState.music_volume_changed.connect(_on_music_volume_changed)
+	_music_player.play()
+
+
+func _on_music_volume_changed(volume: float) -> void:
+	if _music_player != null:
+		_music_player.volume_db = linear_to_db(volume)
 
 
 func get_engine() -> JunkKingBattleEngine:
@@ -204,6 +236,7 @@ func _on_selection_confirmed(power_up_ids: Array[StringName]) -> void:
 		active_effect_label.text = _error_message(started)
 		return
 
+	_play_music()
 	_resolution_token = GameState.create_junk_king_resolution_token()
 	player_panel.set_power_ups(_engine.get_loadout(JunkKingBattleEngine.PLAYER), true)
 	_refresh_power_up_states()
