@@ -1,6 +1,6 @@
 extends Node
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 const DEFAULT_SAVE_PATH := "user://spinny_slots_save.json"
 const AUTOSAVE_DELAY_SECONDS := 0.4
 const DEV_TEST_SCENE_PREFIX := "res://scenes/dev/"
@@ -211,7 +211,6 @@ func _capture_document() -> Dictionary:
 			"ticket_counts": _sanitize_nonnegative_int_dictionary(GameState.machine_ticket_counts),
 			"mechanic_charges": _sanitize_nonnegative_int_dictionary(GameState.machine_mechanic_charges),
 			"free_rerolls": _sanitize_nonnegative_int_dictionary(GameState.machine_free_rerolls),
-			"machine_upgrade_levels": _sanitize_nonnegative_int_dictionary(GameState.machine_upgrade_levels),
 		},
 		"upgrades": _sanitize_nonnegative_int_dictionary(GameState.upgrade_levels),
 	}
@@ -280,12 +279,14 @@ func _uses_current_schema(raw: Dictionary) -> bool:
 	if not raw.get("machines", null) is Dictionary:
 		return false
 	var story: Dictionary = raw.get("story", {})
+	var machines: Dictionary = raw.get("machines", {})
 	return (
 		story.has("junk_king_intro_triggered")
 		and story.has("junk_king_intro_completed")
 		and story.has("junk_king_available")
 		and story.has("junk_king_defeated")
 		and story.has("metropolis_unlocked")
+		and not machines.has("machine_upgrade_levels")
 	)
 
 
@@ -350,6 +351,11 @@ func _normalize_document(raw: Dictionary) -> Dictionary:
 		base.get("machine_ticket_counts", base.get("ticket_counts", {}))
 	)
 	var upgrades_value: Variant = base.get("upgrades", base.get("upgrade_levels", {}))
+	var upgrade_levels := _sanitize_nonnegative_int_dictionary(upgrades_value)
+	var legacy_machine_upgrades := _sanitize_nonnegative_int_dictionary(
+		machines.get("machine_upgrade_levels", {})
+	)
+	_merge_legacy_machine_upgrades(upgrade_levels, legacy_machine_upgrades)
 
 	return {
 		"save_version": SAVE_VERSION,
@@ -402,11 +408,8 @@ func _normalize_document(raw: Dictionary) -> Dictionary:
 			"ticket_counts": _sanitize_nonnegative_int_dictionary(ticket_counts_value),
 			"mechanic_charges": _sanitize_nonnegative_int_dictionary(machines.get("mechanic_charges", {})),
 			"free_rerolls": _sanitize_nonnegative_int_dictionary(machines.get("free_rerolls", {})),
-			"machine_upgrade_levels": _sanitize_nonnegative_int_dictionary(
-				machines.get("machine_upgrade_levels", {})
-			),
 		},
-		"upgrades": _sanitize_nonnegative_int_dictionary(upgrades_value),
+		"upgrades": upgrade_levels,
 	}
 
 
@@ -647,3 +650,16 @@ func _merge_unique_strings(first: Array[String], second: Array[String]) -> Array
 		if value not in merged:
 			merged.append(value)
 	return merged
+
+
+## Area 2 originally saved upgrades as "machine_id::upgrade_id". Preserve the
+## highest earned level for each upgrade when moving to the shared global
+## track; taking the maximum avoids both progress loss and double-counting.
+func _merge_legacy_machine_upgrades(global_levels: Dictionary, legacy_levels: Dictionary) -> void:
+	for legacy_key in legacy_levels:
+		var parts := String(legacy_key).split("::", false)
+		if parts.size() < 2:
+			continue
+		var upgrade_id := parts[parts.size() - 1]
+		var legacy_level := maxi(int(legacy_levels[legacy_key]), 0)
+		global_levels[upgrade_id] = maxi(int(global_levels.get(upgrade_id, 0)), legacy_level)

@@ -9,5 +9,5 @@ extends HBoxContainer
 func configure(symbol: SlotSymbol, probability: float) -> void:
 	icon.texture = symbol.icon
 	name_label.text = symbol.display_name
-	value_label.text = "$%d" % symbol.payout
+	value_label.text = NumberFormatter.currency(symbol.payout)
 	percent_label.text = "%d%%" % roundi(probability * 100.0)

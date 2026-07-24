@@ -241,7 +241,7 @@ func _spawn_next_bag() -> void:
 
 func _spawn_floating_reward(payout: int) -> void:
 	var reward := Label.new()
-	reward.text = "+$%d" % payout
+	reward.text = "+%s" % NumberFormatter.currency(payout)
 	reward.custom_minimum_size = Vector2(160.0, 60.0)
 	reward.position = dumpster.position + Vector2(-80.0, -155.0) * _world_scale
 	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -791,7 +791,7 @@ func _on_spin_pressed() -> void:
 		names.append(symbol.display_name)
 	result_label.text = "  •  ".join(names)
 	var pending_payout := maxi(int(outcome.get("payout", 0)), 0)
-	payout_label.text = "+%d COINS" % pending_payout
+	payout_label.text = NumberFormatter.reward(pending_payout)
 	var rarest_hits := int(outcome.get("rarest_hits", 0))
 	if rarest_hits > 0:
 		confetti_effect.play(GameState.reduced_motion)

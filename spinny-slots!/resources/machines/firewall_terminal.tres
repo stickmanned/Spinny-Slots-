@@ -14,7 +14,7 @@
 
 [sub_resource type="AtlasTexture" id="Atlas_cabinet"]
 atlas = ExtResource("3_cabinet")
-region = Rect2(520, 300, 920, 1500)
+region = Rect2(500, 300, 1000, 1400)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
@@ -27,6 +27,7 @@ display_name = "Binary Chip"
 icon = ExtResource("7_chip_icon")
 tier = 0
 weight = 36.0
+payout = 2800
 
 [sub_resource type="Resource" id="Symbol_lock"]
 script = ExtResource("4_symbol")
@@ -35,6 +36,7 @@ display_name = "Padlock"
 icon = ExtResource("8_lock_icon")
 tier = 0
 weight = 28.0
+payout = 4200
 
 [sub_resource type="Resource" id="Symbol_shield"]
 script = ExtResource("4_symbol")
@@ -43,6 +45,7 @@ display_name = "Firewall Shield"
 icon = ExtResource("9_shield_icon")
 tier = 1
 weight = 18.0
+payout = 8500
 
 [sub_resource type="Resource" id="Symbol_virus"]
 script = ExtResource("4_symbol")
@@ -51,6 +54,7 @@ display_name = "Virus Icon"
 icon = ExtResource("10_virus_icon")
 tier = 2
 weight = 12.0
+payout = 17000
 
 [sub_resource type="Resource" id="Symbol_key"]
 script = ExtResource("4_symbol")
@@ -59,6 +63,7 @@ display_name = "Golden Key"
 icon = ExtResource("11_key_icon")
 tier = 3
 weight = 6.0
+payout = 42500
 
 [sub_resource type="Resource" id="Tier_common"]
 script = ExtResource("5_tier")
@@ -104,5 +109,5 @@ cabinet_texture = SubResource("Atlas_cabinet")
 reel_count = 3
 symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_chip"), SubResource("Symbol_lock"), SubResource("Symbol_shield"), SubResource("Symbol_virus"), SubResource("Symbol_key")])
 payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
-screen_region = Rect2(160, 340, 640, 500)
+screen_region = Rect2(180, 340, 640, 500)
 mechanic = SubResource("Mechanic_hack")

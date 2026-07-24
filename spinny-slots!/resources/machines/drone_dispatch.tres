@@ -14,7 +14,7 @@
 
 [sub_resource type="AtlasTexture" id="Atlas_cabinet"]
 atlas = ExtResource("3_cabinet")
-region = Rect2(20, 20, 984, 984)
+region = Rect2(10, 0, 1004, 1004)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
@@ -27,6 +27,7 @@ display_name = "Taxi Light"
 icon = ExtResource("7_taxi_icon")
 tier = 0
 weight = 35.0
+payout = 1100
 
 [sub_resource type="Resource" id="Symbol_pin"]
 script = ExtResource("4_symbol")
@@ -35,6 +36,7 @@ display_name = "Map Pin"
 icon = ExtResource("8_pin_icon")
 tier = 0
 weight = 27.0
+payout = 1700
 
 [sub_resource type="Resource" id="Symbol_drone"]
 script = ExtResource("4_symbol")
@@ -43,6 +45,7 @@ display_name = "Drone Fleet Icon"
 icon = ExtResource("9_drone_icon")
 tier = 1
 weight = 20.0
+payout = 3400
 
 [sub_resource type="Resource" id="Symbol_badge"]
 script = ExtResource("4_symbol")
@@ -51,6 +54,7 @@ display_name = "Passenger Star"
 icon = ExtResource("10_badge_icon")
 tier = 2
 weight = 12.0
+payout = 6800
 
 [sub_resource type="Resource" id="Symbol_bolt"]
 script = ExtResource("4_symbol")
@@ -59,6 +63,7 @@ display_name = "Surge Bolt"
 icon = ExtResource("11_bolt_icon")
 tier = 3
 weight = 6.0
+payout = 17000
 
 [sub_resource type="Resource" id="Tier_common"]
 script = ExtResource("5_tier")
@@ -92,7 +97,7 @@ payouts_by_count = {
 script = ExtResource("6_mechanic")
 kind = 1
 surge_multiplier_sequence = Array[float]([1.0, 1.5, 2.0, 3.0, 5.0])
-surge_reroll_cost = 20
+surge_reroll_cost = 20000
 surge_max_rerolls_per_spin = 3
 
 [resource]
@@ -105,5 +110,5 @@ cabinet_texture = SubResource("Atlas_cabinet")
 reel_count = 3
 symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_taxi"), SubResource("Symbol_pin"), SubResource("Symbol_drone"), SubResource("Symbol_badge"), SubResource("Symbol_bolt")])
 payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
-screen_region = Rect2(267, 226, 450, 246)
+screen_region = Rect2(277, 246, 450, 246)
 mechanic = SubResource("Mechanic_surge")

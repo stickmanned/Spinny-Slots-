@@ -361,9 +361,9 @@ func _perform_turn(contestant: StringName, active_power_up_id: StringName = &"")
 func _update_after_resolved_spin(panel: BattleContestantPanel, outcome: Dictionary) -> void:
 	var payout := maxi(int(outcome.get("payout", 0)), 0)
 	var siphon_amount := maxi(int(outcome.get("siphon_amount", 0)), 0)
-	var result_text := "+$%d" % payout
+	var result_text := "+%s" % NumberFormatter.currency(payout)
 	if siphon_amount > 0:
-		result_text += "  ($%d siphoned)" % siphon_amount
+		result_text += "  (%s siphoned)" % NumberFormatter.currency(siphon_amount)
 	panel.set_result("%s | %s" % [_format_symbol_ids(outcome.get("symbol_ids", [])), result_text])
 	active_effect_label.text = _format_resolved_effect(outcome)
 	var scores := _engine.get_scores()
@@ -550,9 +550,9 @@ func _show_final_totals() -> void:
 	_result_winner = _engine.get_winner()
 	var scores := _engine.get_scores()
 	outcome_title.text = "FINAL AMOUNTS"
-	outcome_totals.text = "YOU: $%d\nJUNK KING: $%d" % [
-		int(scores.get(String(JunkKingBattleEngine.PLAYER), 0)),
-		int(scores.get(String(JunkKingBattleEngine.JUNK_KING), 0)),
+	outcome_totals.text = "YOU: %s\nJUNK KING: %s" % [
+		NumberFormatter.currency(int(scores.get(String(JunkKingBattleEngine.PLAYER), 0))),
+		NumberFormatter.currency(int(scores.get(String(JunkKingBattleEngine.JUNK_KING), 0))),
 	]
 	_set_outcome_message("Both contestants completed the 10 spins.")
 	if _engine.get_sudden_death_round() > 0:
@@ -644,10 +644,10 @@ func _resolve_victory() -> void:
 	if not SaveManager.flush():
 		push_error("Junk King victory resolved in memory, but the save could not be written.")
 	outcome_title.text = "METROPOLIS UNLOCKED"
-	outcome_totals.text = "JUNK KING'S WINNINGS: $%d\nWALLET: $%d -> $%d" % [
-		boss_score,
-		wallet_before,
-		GameState.money,
+	outcome_totals.text = "JUNK KING'S WINNINGS: %s\nWALLET: %s -> %s" % [
+		NumberFormatter.currency(boss_score),
+		NumberFormatter.currency(wallet_before),
+		NumberFormatter.currency(GameState.money),
 	]
 	_set_outcome_message("Congratulations, you've unlocked Metropolis!")
 	primary_outcome_button.text = "VISIT METROPOLIS"
@@ -656,8 +656,8 @@ func _resolve_victory() -> void:
 	secondary_outcome_button.visible = true
 	_outcome_mode = &"victory_unlock"
 	_append_log(
-		"Victory resolved%s: the Junk King's $%d battle total was added once."
-		% ["" if applied else " previously", boss_score]
+		"Victory resolved%s: the Junk King's %s battle total was added once."
+		% ["" if applied else " previously", NumberFormatter.currency(boss_score)]
 	)
 	await _reveal_outcome_panel()
 	var generation := _sequence_generation
@@ -686,7 +686,7 @@ func _resolve_defeat() -> void:
 	if not SaveManager.flush():
 		push_error("Junk King defeat resolved in memory, but the save could not be written.")
 	outcome_title.text = "WALLET RESET"
-	outcome_totals.text = "WALLET: $%d" % wallet_before
+	outcome_totals.text = "WALLET: %s" % NumberFormatter.currency(wallet_before)
 	_set_outcome_message("")
 	primary_outcome_button.text = "RETURN TO JUNKYARD"
 	primary_outcome_button.disabled = true
@@ -715,13 +715,13 @@ func _set_outcome_message(message_text: String) -> void:
 
 
 func _set_wallet_outcome_value(value: int) -> void:
-	outcome_totals.text = "WALLET: $%d" % maxi(value, 0)
+	outcome_totals.text = "WALLET: %s" % NumberFormatter.currency(maxi(value, 0))
 
 
 func _set_victory_wallet_outcome_value(value: int, boss_score: int) -> void:
-	outcome_totals.text = "JUNK KING'S WINNINGS: $%d\nWALLET: $%d" % [
-		maxi(boss_score, 0),
-		maxi(value, 0),
+	outcome_totals.text = "JUNK KING'S WINNINGS: %s\nWALLET: %s" % [
+		NumberFormatter.currency(maxi(boss_score, 0)),
+		NumberFormatter.currency(maxi(value, 0)),
 	]
 
 
@@ -804,7 +804,7 @@ func _format_resolved_effect(outcome: Dictionary) -> String:
 			notes.append(_power_up_name(active_id))
 	var siphon_amount := int(outcome.get("siphon_amount", 0))
 	if siphon_amount > 0:
-		notes.append("Payout Siphon transferred $%d" % siphon_amount)
+		notes.append("Payout Siphon transferred %s" % NumberFormatter.currency(siphon_amount))
 	if notes.is_empty():
 		return "Configured symbol rewards applied with no bonus modifier."
 	return " | ".join(notes)
@@ -820,7 +820,7 @@ func _format_result_log(outcome: Dictionary) -> String:
 	var headline := "%s   %s" % [
 		_tint("YOU" if is_player else "JUNK KING", LOG_COLOR_PLAYER if is_player else LOG_COLOR_BOSS),
 		_tint(
-			"+$%d" % maxi(int(outcome.get("payout", 0)), 0),
+			"+%s" % NumberFormatter.currency(maxi(int(outcome.get("payout", 0)), 0)),
 			LOG_COLOR_GAIN if is_player else LOG_COLOR_BOSS
 		),
 	]
@@ -829,14 +829,14 @@ func _format_result_log(outcome: Dictionary) -> String:
 		headline += "   %s" % _tint(_power_up_name(active_id), LOG_COLOR_POWER_UP)
 	var siphon_amount := maxi(int(outcome.get("siphon_amount", 0)), 0)
 	if siphon_amount > 0:
-		headline += "   %s" % _tint("siphon $%d" % siphon_amount, LOG_COLOR_POWER_UP)
+		headline += "   %s" % _tint("siphon %s" % NumberFormatter.currency(siphon_amount), LOG_COLOR_POWER_UP)
 	var detail := "%s   %s" % [
 		_format_symbol_icons(outcome),
 		_tint(
-			"You $%d · King $%d"
+			"You %s · King %s"
 			% [
-				int(scores.get(String(JunkKingBattleEngine.PLAYER), 0)),
-				int(scores.get(String(JunkKingBattleEngine.JUNK_KING), 0)),
+				NumberFormatter.currency(int(scores.get(String(JunkKingBattleEngine.PLAYER), 0))),
+				NumberFormatter.currency(int(scores.get(String(JunkKingBattleEngine.JUNK_KING), 0))),
 			],
 			LOG_COLOR_TOTALS
 		),

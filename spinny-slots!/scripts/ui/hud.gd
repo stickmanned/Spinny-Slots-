@@ -30,9 +30,8 @@ var _upgrade_tween: Tween
 var _coin_pulse_tween: Tween
 var _upgrades_enabled := true
 var _current_map_id: String = MapConfig.JUNKYARD_ID
-## Source for the upgrade panel. Defaults to Economy (Junkyard's global
-## tracks); metropolis_job swaps in a per-machine provider when its selected
-## machine changes.
+## Source for the upgrade panel. Economy owns the shared persistent track;
+## the provider seam remains for isolated tests and future alternate panels.
 var _upgrade_provider: Object = Economy
 
 
@@ -40,6 +39,7 @@ func _ready() -> void:
 	GameState.money_changed.connect(_on_money_changed)
 	GameState.gems_changed.connect(_on_gems_changed)
 	GameState.upgrade_levels_changed.connect(_on_upgrade_levels_changed)
+	GameState.story_progress_changed.connect(_on_story_progress_changed)
 	_on_money_changed(GameState.money)
 	_on_gems_changed(GameState.gems)
 	_build_upgrade_rows()
@@ -140,9 +140,8 @@ func _stop_visibility_tweens() -> void:
 		_upgrade_tween.kill()
 
 
-## Points the upgrade panel at a different upgrade track (e.g. a per-machine
-## Metropolis provider) and rebuilds the rows against it. Passing null restores
-## the Junkyard/global Economy source.
+## Points the upgrade panel at a compatible provider and rebuilds its rows.
+## Passing null restores the shared Economy source.
 func set_upgrade_provider(provider: Object) -> void:
 	_upgrade_provider = provider if provider != null else Economy
 	_build_upgrade_rows()
@@ -170,7 +169,7 @@ func get_coin_balance_target() -> Control:
 
 
 func set_presented_money(value: int) -> void:
-	coin_value.text = str(value)
+	coin_value.text = NumberFormatter.compact(value)
 
 
 func pulse_coin_balance() -> void:
@@ -200,13 +199,18 @@ func _on_upgrade_levels_changed(_upgrade_id: StringName, _level: int) -> void:
 	_refresh_upgrade_rows()
 
 
+func _on_story_progress_changed() -> void:
+	# Unlocking Metropolis raises the caps on the same persistent upgrade rows.
+	_refresh_upgrade_rows()
+
+
 func _on_money_changed(value: int) -> void:
 	set_presented_money(value)
 	_refresh_upgrade_rows()
 
 
 func _on_gems_changed(value: int) -> void:
-	gem_value.text = str(value)
+	gem_value.text = NumberFormatter.compact(value)
 
 
 func _on_settings_pressed() -> void:

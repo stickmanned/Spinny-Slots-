@@ -71,17 +71,8 @@ func refresh(purchases_enabled: bool) -> void:
 		disabled = true
 		return
 	var cost: int = _provider.get_upgrade_cost(_config.upgrade_id)
-	cost_label.text = "$%s" % _format_cost(cost)
+	cost_label.text = NumberFormatter.currency(cost)
 	disabled = not purchases_enabled or not _provider.can_afford(cost)
-
-
-## Metropolis upgrade costs reach the millions; abbreviate so they fit the row.
-func _format_cost(amount: int) -> String:
-	if amount >= 1_000_000:
-		return ("%.2f" % (float(amount) / 1_000_000.0)).trim_suffix("0").trim_suffix("0").trim_suffix(".") + "M"
-	if amount >= 10_000:
-		return "%dK" % roundi(float(amount) / 1_000.0)
-	return str(amount)
 
 
 func _on_pressed() -> void:

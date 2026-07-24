@@ -30,7 +30,7 @@ func _run() -> void:
 	_verify_ticket_purchase_and_spend()
 	_verify_hack_charge_award_and_spend()
 	_verify_surge_reroll()
-	_verify_per_machine_upgrades()
+	_verify_shared_upgrades()
 	_verify_baseline_balance_band()
 	_verify_save_round_trip()
 	await _verify_job_scene_spin()
@@ -62,6 +62,8 @@ func _verify_machine_data_shape() -> void:
 	}
 	for machine in MACHINES:
 		_assert_equal(machine.symbols.size(), 5, "%s defines exactly five symbols" % machine.display_name)
+		for symbol in machine.symbols:
+			_assert_true(symbol.payout > 0, "%s pays coins whenever %s lands" % [machine.display_name, symbol.display_name])
 		_assert_equal(
 			machine.reel_count,
 			int(expected_reel_counts[machine.machine_id]),
@@ -123,7 +125,8 @@ func _verify_three_reel_match_evaluation() -> void:
 
 	var unmatched: Array[MetropolisSymbol] = [common, common, other]
 	var no_matches := MetropolisEconomy.evaluate_matches(machine, unmatched)
-	_assert_true(no_matches.is_empty(), "Two-of-three does not qualify as a win on a 3-reel machine")
+	_assert_true(no_matches.is_empty(), "Two-of-three does not qualify for a match bonus")
+	_assert_true(MetropolisEconomy.total_symbol_payout(unmatched) > 0, "A non-matching row still pays every landed symbol")
 
 
 func _verify_wide_reel_count_evaluation() -> void:
@@ -176,7 +179,11 @@ func _verify_cascade_invariants() -> void:
 		var summed_payout := 0
 		for tier in tiers:
 			summed_payout += int(tier.get("payout", 0))
-		_assert_equal(summed_payout, int(outcome.get("gross_payout", -1)), "Gross payout equals the sum of every cascade tier's payout (seed %d)" % seed_value)
+		_assert_equal(
+			int(outcome.get("symbol_payout", -1)) + summed_payout,
+			int(outcome.get("gross_payout", -1)),
+			"Gross payout combines guaranteed symbol rewards and cascade bonuses (seed %d)" % seed_value
+		)
 
 
 func _verify_ticket_purchase_and_spend() -> void:
@@ -265,36 +272,39 @@ func _verify_surge_reroll() -> void:
 	_assert_true(not bool(capped_result.get("ok", false)), "Rerolling beyond the per-spin cap fails")
 
 
-func _verify_per_machine_upgrades() -> void:
+func _verify_shared_upgrades() -> void:
 	GameState.reset_for_new_game()
-	var luck_config := MetropolisEconomy.get_upgrade_config(&"luck")
-	var coin_config := MetropolisEconomy.get_upgrade_config(&"coin_multiplier")
-	_assert_true(luck_config != null and coin_config != null, "Metropolis upgrade configs load")
-	_assert_equal(luck_config.max_level, 10, "Metropolis Luck cap is 10")
-	_assert_equal(MetropolisEconomy.get_upgrade_config(&"spin_speed").max_level, 10, "Metropolis Spin Speed cap is 10")
-	_assert_equal(coin_config.max_level, 24, "Metropolis Coin Multiplier cap is 24")
-	# Junkyard's own configs must be untouched by the Metropolis fork.
-	_assert_equal(Economy.get_upgrade_config(&"luck").max_level, 5, "Junkyard Luck cap stays 5 (fork did not alter it)")
-	_assert_equal(Economy.get_upgrade_config(&"coin_multiplier").max_level, 10, "Junkyard Coin cap stays 10")
+	_assert_equal(Economy.get_upgrade_max_level(&"luck"), 5, "Luck remains capped at Junkyard level 5 before Area 2")
+	_assert_equal(Economy.get_upgrade_max_level(&"spin_speed"), 5, "Spin Speed remains capped at Junkyard level 5 before Area 2")
+	_assert_equal(Economy.get_upgrade_max_level(&"coin_multiplier"), 10, "Multiplier remains capped at Junkyard level 10 before Area 2")
+	GameState.mark_metropolis_unlocked()
+	_assert_equal(Economy.get_upgrade_max_level(&"luck"), 10, "Metropolis unlock extends Luck to level 10")
+	_assert_equal(Economy.get_upgrade_max_level(&"spin_speed"), 10, "Metropolis unlock extends Spin Speed to level 10")
+	_assert_equal(Economy.get_upgrade_max_level(&"coin_multiplier"), 24, "Metropolis unlock extends Multiplier to level 24")
 
 	var neon := MACHINES[0]
 	var quantum := MACHINES[4]
-	# Cost scales with each machine's ticket price via cost_fraction_of_ticket.
 	var neon_luck_cost := MetropolisEconomy.get_upgrade_cost(neon, &"luck")
 	var quantum_luck_cost := MetropolisEconomy.get_upgrade_cost(quantum, &"luck")
-	_assert_equal(neon_luck_cost, roundi(neon.ticket_price * luck_config.cost_fraction_of_ticket), "Neon Luck L0 cost is a fraction of its ticket price")
-	_assert_true(quantum_luck_cost > neon_luck_cost, "A pricier machine's upgrade costs more")
+	_assert_equal(neon_luck_cost, quantum_luck_cost, "Upgrade price stays consistent when the selected machine changes")
+	GameState.upgrade_levels["luck"] = 5
+	_assert_equal(Economy.get_upgrade_cost(&"luck"), 150_000, "The first extended Luck level uses its Metropolis-scale configured cost")
+	_assert_equal(
+		MetropolisEconomy.get_upgrade_cost(neon, &"luck"),
+		MetropolisEconomy.get_upgrade_cost(quantum, &"luck"),
+		"Extended upgrade prices remain machine-independent"
+	)
 
-	# Purchasing raises only the targeted machine's track and spends the cost.
 	GameState.money = 100_000_000
 	var before := GameState.money
 	var coin_cost := MetropolisEconomy.get_upgrade_cost(neon, &"coin_multiplier")
 	_assert_true(MetropolisEconomy.purchase_upgrade(neon, &"coin_multiplier"), "A Metropolis upgrade can be purchased")
 	_assert_equal(GameState.money, before - coin_cost, "Purchasing an upgrade deducts exactly its cost")
-	_assert_equal(GameState.get_machine_upgrade_level(neon.machine_id, &"coin_multiplier"), 1, "Purchase raises the machine's upgrade level")
-	_assert_equal(GameState.get_machine_upgrade_level(quantum.machine_id, &"coin_multiplier"), 0, "A different machine's track is unaffected (per-machine)")
+	_assert_equal(GameState.get_upgrade_level(&"coin_multiplier"), 1, "Purchase raises the global upgrade level")
+	_assert_equal(MetropolisEconomy.get_upgrade_level(quantum.machine_id, &"coin_multiplier"), 1, "Every Metropolis machine sees the same level")
+	_assert_equal(Economy.get_upgrade_level(&"coin_multiplier"), 1, "Junkyard sees the same level")
 
-	# The Coin Multiplier actually scales that machine's payout.
+	# The shared Coin Multiplier scales Metropolis payouts as well as Junkyard.
 	var mult := MetropolisEconomy.get_upgrade_multiplier(neon.machine_id, &"coin_multiplier")
 	_assert_true(mult > 1.0, "Coin Multiplier level raises the payout multiplier above 1.0")
 	var rng := RandomNumberGenerator.new()
@@ -336,9 +346,9 @@ func _verify_save_round_trip() -> void:
 	GameState.add_machine_mechanic_charge(machine.machine_id, 3)
 	GameState.add_machine_mechanic_charge(machine.machine_id, 3)
 	GameState.add_machine_free_reroll(surge_machine.machine_id)
-	GameState.increment_machine_upgrade_level(machine.machine_id, &"coin_multiplier")
-	GameState.increment_machine_upgrade_level(machine.machine_id, &"coin_multiplier")
-	GameState.increment_machine_upgrade_level(MACHINES[0].machine_id, &"luck")
+	GameState.increment_upgrade_level(&"coin_multiplier")
+	GameState.increment_upgrade_level(&"coin_multiplier")
+	GameState.increment_upgrade_level(&"luck")
 	_assert_true(SaveManager.save_now(), "Metropolis mechanic state saves successfully")
 
 	GameState.reset_for_new_game()
@@ -346,8 +356,34 @@ func _verify_save_round_trip() -> void:
 	_assert_true(SaveManager.load_now(), "Metropolis mechanic state loads successfully")
 	_assert_equal(GameState.get_machine_mechanic_charges(machine.machine_id), 2, "Hack Charges survive a save/load round-trip")
 	_assert_equal(GameState.get_machine_free_rerolls(surge_machine.machine_id), 1, "Free reroll tokens survive a save/load round-trip")
-	_assert_equal(GameState.get_machine_upgrade_level(machine.machine_id, &"coin_multiplier"), 2, "Per-machine upgrade levels survive a save/load round-trip")
-	_assert_equal(GameState.get_machine_upgrade_level(MACHINES[0].machine_id, &"luck"), 1, "Each machine's separate upgrade track round-trips independently")
+	_assert_equal(GameState.get_upgrade_level(&"coin_multiplier"), 2, "Global Multiplier level survives a save/load round-trip")
+	_assert_equal(GameState.get_upgrade_level(&"luck"), 1, "Global Luck level survives a save/load round-trip")
+
+	# Version-2 saves stored one level per Metropolis machine. Migrate the
+	# highest earned level into the shared track without adding levels together.
+	SaveManager.delete_save_for_tests()
+	var legacy_file := FileAccess.open(TEST_SAVE_PATH, FileAccess.WRITE)
+	_assert_true(legacy_file != null, "A legacy migration fixture can be written")
+	if legacy_file != null:
+		legacy_file.store_string(JSON.stringify({
+			"save_version": 2,
+			"wallet": 1234,
+			"story": {"metropolis_unlocked": true},
+			"machines": {
+				"machine_upgrade_levels": {
+					"firewall::coin_multiplier": 2,
+					"neon_arcade::coin_multiplier": 1,
+					"neon_arcade::luck": 3,
+				},
+			},
+			"upgrades": {"coin_multiplier": 1},
+		}))
+		legacy_file.close()
+		GameState.reset_for_new_game()
+		_assert_true(SaveManager.load_now(), "A version-2 per-machine upgrade save migrates")
+		_assert_equal(GameState.get_upgrade_level(&"coin_multiplier"), 2, "Migration keeps the highest Multiplier level")
+		_assert_equal(GameState.get_upgrade_level(&"luck"), 3, "Migration keeps legacy Luck progress")
+		_assert_true(GameState.machine_upgrade_levels.is_empty(), "Migrated saves no longer retain parallel machine upgrade tracks")
 
 	SaveManager.delete_save_for_tests()
 	GameState.reset_for_new_game()
@@ -367,17 +403,20 @@ func _verify_job_scene_spin() -> void:
 	await _frames(3)
 
 	var spin_button: Button = job.get_node("%SpinButton")
-	var result_label: Label = job.get_node("%ResultLabel")
+	var payout_label: Label = job.get_node("%PayoutLabel")
 	_assert_true(spin_button != null, "The job scene resolves its SpinButton unique node")
 	_assert_true(not spin_button.disabled, "The spin button is enabled while a ticket is held")
 
 	var money_before := GameState.money
 	spin_button.emit_signal("pressed")
-	await get_tree().create_timer(AudioFx.get_spin_duration() + 0.6).timeout
+	for _index in range(900):
+		if not bool(job.get("_spin_in_progress")):
+			break
+		await get_tree().process_frame
 	await _frames(2)
 
 	_assert_equal(GameState.get_machine_ticket_count(machine.machine_id), 0, "Spinning consumes the held ticket")
-	_assert_true(not result_label.text.is_empty(), "The result label shows the landed symbols after a spin")
+	_assert_true(not payout_label.text.is_empty(), "The payout label shows the awarded amount after a spin")
 	_assert_true(GameState.money >= money_before, "Money never goes negative after a spin resolves")
 
 	job.queue_free()

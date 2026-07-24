@@ -133,8 +133,8 @@ var machine_ticket_counts: Dictionary = {}
 var machine_mechanic_charges: Dictionary = {}
 var machine_free_rerolls: Dictionary = {}
 var upgrade_levels: Dictionary = {}
-## Metropolis-only: each machine upgrades independently. Keyed
-## "machine_id::upgrade_id" -> level. Junkyard keeps using upgrade_levels.
+## Legacy Area 2 per-machine levels retained only so version-2 saves can be
+## migrated without losing progress. New purchases use upgrade_levels.
 var machine_upgrade_levels: Dictionary = {}
 
 var _resolved_junk_king_battle_tokens: Dictionary = {}

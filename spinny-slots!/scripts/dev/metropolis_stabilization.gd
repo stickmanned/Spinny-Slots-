@@ -22,6 +22,7 @@ func _ready() -> void:
 
 func _run() -> void:
 	Engine.time_scale = 8.0
+	_verify_compact_number_formatting()
 	await _verify_ticket_odds_and_stable_layout()
 	await _verify_all_machine_purchase_spin_payouts()
 	await _verify_mechanic_controls_and_state()
@@ -66,13 +67,28 @@ func _verify_ticket_odds_and_stable_layout() -> void:
 		_assert_true(_rect_contains(row_rect, ticket_art.get_global_rect()), "%s ticket art stays inside its button" % row.name)
 		_assert_true(_rect_contains(row_rect, machine_name.get_global_rect()), "%s machine name stays inside its button" % row.name)
 		_assert_true(_rect_contains(row_rect, price_label.get_global_rect()), "%s price stays inside its button" % row.name)
+		var machine = row.call("get_machine")
+		_assert_equal(price_label.text, NumberFormatter.currency(machine.ticket_price), "%s price uses compact currency formatting" % row.name)
+
+	var first_row := ticket_rows.get_child(0) as Control
+	first_row.call("_on_mouse_entered")
+	await get_tree().create_timer(0.2).timeout
+	_assert_true(
+		_rect_contains(ticket_scroll.get_global_rect(), first_row.get_global_rect()),
+		"A hovered ticket can enlarge without being cut by the scroll viewport walls"
+	)
+	first_row.call("_on_mouse_exited")
+	var skyline_ticket := MACHINES[3].ticket_texture as AtlasTexture
+	_assert_true(
+		skyline_ticket != null and skyline_ticket.region.size.y >= 800.0,
+		"Skyline ticket atlas includes the complete top and bottom artwork"
+	)
 
 	var selector := job.get_node("%MachineSelectorPanel") as PanelContainer
 	var cabinet := selector.get_node("%CabinetArt") as TextureRect
 	var left_arrow := selector.get_node("%LeftArrow") as Control
 	var right_arrow := selector.get_node("%RightArrow") as Control
 	var payout_label := job.get_node("%PayoutLabel") as Label
-	var result_label := job.get_node("%ResultLabel") as Label
 	var spin_button := job.get_node("%SpinButton") as Button
 	var base_rects := {
 		"cabinet": cabinet.get_global_rect(),
@@ -81,12 +97,13 @@ func _verify_ticket_odds_and_stable_layout() -> void:
 		"payout": payout_label.get_global_rect(),
 		"spin": spin_button.get_global_rect(),
 	}
-	_assert_true(result_label.modulate.a > 0.99, "Metropolis result label is visible")
 
 	for machine in MACHINES:
 		selector.call("configure", MACHINES, machine.machine_id)
 		job.call("_on_selection_changed", machine)
-		await _frames(3)
+		var cabinet_texture := machine.cabinet_texture as AtlasTexture
+		_assert_true(cabinet_texture != null, "%s uses a cabinet atlas texture" % machine.display_name)
+		_assert_true(cabinet_texture.region.end.x >= 1005.0, "%s cabinet atlas includes its full right edge without cutoff" % machine.display_name)
 		_assert_rect_close(cabinet.get_global_rect(), base_rects["cabinet"], "%s cabinet stays fixed" % machine.display_name)
 		_assert_rect_close(left_arrow.get_global_rect(), base_rects["left_arrow"], "%s left arrow stays fixed" % machine.display_name)
 		_assert_rect_close(right_arrow.get_global_rect(), base_rects["right_arrow"], "%s right arrow stays fixed" % machine.display_name)
@@ -97,6 +114,13 @@ func _verify_ticket_odds_and_stable_layout() -> void:
 		_assert_equal(int(active_strip.call("get_reel_count")), machine.reel_count, "%s presents its configured reel count" % machine.display_name)
 		_assert_true(_rect_contains(cabinet.get_global_rect(), active_strip.get_global_rect()), "%s reel display stays inside its cabinet" % machine.display_name)
 
+	# The ticket panel now expands to fill whatever room the left column has
+	# (matching Junkyard), so pin it to a known-small height here to prove the
+	# scroll/clip mechanics still work when content genuinely overflows,
+	# independent of how tall the host viewport happens to be.
+	ticket_shop.size_flags_vertical = 0
+	ticket_shop.custom_minimum_size.y = 220
+	await _frames(2)
 	ticket_scroll.scroll_vertical = 100000
 	await _frames(3)
 	var scroll_bar := ticket_scroll.get_v_scroll_bar()
@@ -111,6 +135,15 @@ func _verify_ticket_odds_and_stable_layout() -> void:
 	await _frames(3)
 
 
+func _verify_compact_number_formatting() -> void:
+	_assert_equal(NumberFormatter.compact(999), "999", "Values below one thousand stay exact")
+	_assert_equal(NumberFormatter.compact(1_000), "1K", "Thousands use K")
+	_assert_equal(NumberFormatter.compact(1_250), "1.25K", "Compact values retain useful precision")
+	_assert_equal(NumberFormatter.compact(1_000_000), "1M", "Millions use M")
+	_assert_equal(NumberFormatter.compact(1_250_000_000), "1.25B", "Billions use B")
+	_assert_equal(NumberFormatter.compact(100_000_000_000), "100B", "Whole three-digit abbreviations keep trailing zeroes")
+
+
 func _verify_all_machine_purchase_spin_payouts() -> void:
 	_prepare_metropolis_state()
 	var job := JOB_SCENE.instantiate() as Control
@@ -118,7 +151,6 @@ func _verify_all_machine_purchase_spin_payouts() -> void:
 	await _frames(6)
 	var ticket_shop := job.get_node("%TicketShopPanel") as PanelContainer
 	var spin_button := job.get_node("%SpinButton") as Button
-	var result_label := job.get_node("%ResultLabel") as Label
 	var payout_label := job.get_node("%PayoutLabel") as Label
 
 	for machine in MACHINES:
@@ -149,8 +181,7 @@ func _verify_all_machine_purchase_spin_payouts() -> void:
 		var expected_payout := int(expected.get("payout", 0))
 		_assert_equal(GameState.get_machine_ticket_count(machine.machine_id), 0, "%s spin consumes exactly one ticket" % machine.display_name)
 		_assert_equal(GameState.money, machine.ticket_price + expected_payout, "%s credits the exact predetermined payout" % machine.display_name)
-		_assert_true(not result_label.text.is_empty(), "%s spin reveals symbol names" % machine.display_name)
-		_assert_equal(payout_label.text, "+%d COINS" % expected_payout, "%s payout label shows the awarded amount" % machine.display_name)
+		_assert_equal(payout_label.text, NumberFormatter.reward(expected_payout), "%s payout label shows the awarded amount" % machine.display_name)
 		var money_after_spin := GameState.money
 		spin_button.emit_signal("pressed")
 		await _frames(3)
@@ -175,14 +206,11 @@ func _verify_mechanic_controls_and_state() -> void:
 	await _frames(3)
 	var surge_panel := job.get_node("%SurgePanel") as Control
 	var surge_reroll := job.get_node("%SurgeRerollButton") as Button
-	var surge_lock := job.get_node("%SurgeLockButton") as Button
 	_assert_true(surge_panel.visible, "Rideshare shows its Surge controls")
 	surge_reroll.emit_signal("pressed")
 	await _frames(2)
 	_assert_equal(GameState.get_machine_free_rerolls(surge_machine.machine_id), 0, "Surge reroll consumes a free token before cash")
 	_assert_equal(int(job.get("_surge_rerolls_used")), 1, "Surge reroll advances the per-spin reroll count")
-	surge_lock.emit_signal("pressed")
-	_assert_true(bool(job.get("_surge_locked")), "Surge lock stores the displayed multiplier for the spin")
 
 	var surge_seeded := _find_positive_outcome(surge_machine, {"surge_multiplier": 1.0})
 	if not surge_seeded.is_empty():

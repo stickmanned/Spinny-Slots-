@@ -86,7 +86,7 @@ func _on_spin_pressed() -> void:
 		names.append((symbol as SlotSymbol).display_name)
 	result_label.text = "  •  ".join(names)
 	var pending_payout := maxi(int(outcome.get("payout", 0)), 0)
-	payout_label.text = "+%d COINS" % pending_payout
+	payout_label.text = NumberFormatter.reward(pending_payout)
 	await coin_collection_effect.play(
 		pending_payout,
 		GameState.money,
@@ -103,7 +103,7 @@ func _on_spin_pressed() -> void:
 
 
 func _refresh() -> void:
-	balance_label.text = "Balance: $%d" % GameState.money
+	balance_label.text = "Balance: %s" % NumberFormatter.currency(GameState.money)
 	if _selected_machine == null:
 		spin_ticket_label.text = "No machine selected"
 		spin_button.disabled = true
@@ -116,7 +116,7 @@ func _refresh() -> void:
 
 
 func _set_presented_balance(value: int) -> void:
-	balance_label.text = "Balance: $%d" % value
+	balance_label.text = "Balance: %s" % NumberFormatter.currency(value)
 
 
 func _pulse_balance() -> void:

@@ -177,7 +177,7 @@ func set_total(value: int, animate: bool = true) -> void:
 		_total_tween.kill()
 	var previous := _parse_total()
 	if not animate or GameState.reduced_motion:
-		total_label.text = "$%d" % maxi(value, 0)
+		total_label.text = NumberFormatter.currency(maxi(value, 0))
 		return
 	_total_tween = create_tween()
 	_total_tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
@@ -193,7 +193,7 @@ func _parse_total() -> int:
 
 
 func _set_presented_total(value: int) -> void:
-	total_label.text = "$%d" % maxi(value, 0)
+	total_label.text = NumberFormatter.currency(maxi(value, 0))
 
 
 func _position_reel_strip() -> void:

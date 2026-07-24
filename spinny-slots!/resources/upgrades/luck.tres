@@ -9,4 +9,7 @@ upgrade_id = &"luck"
 display_name = "Luck"
 icon = ExtResource("2_icon")
 base_cost = 150
+max_level = 10
+max_level_before_metropolis = 5
+metropolis_base_cost = 150000
 tooltip = "Increases the odds of rarer items"

@@ -138,7 +138,7 @@ func _verify_phone_call_and_purchase() -> void:
 	_assert_true(machine_ticket_shop == guided_ticket_shop, "Guided purchase animates into the persistent ticket panel")
 	_assert_true(machine_ticket_shop.get_global_rect().is_equal_approx(guided_panel_rect), "Ticket panel keeps the same position and size after purchase")
 	_assert_equal(int(machine_ticket_shop.call("get_row_count")), 3, "Ticket section uses one compact row per implemented machine")
-	var ticket_rows_container: VBoxContainer = machine_ticket_shop.get_node("Content/TicketScroll/TicketRows")
+	var ticket_rows_container: VBoxContainer = machine_ticket_shop.get_node("%TicketRows")
 	for row_index in range(ticket_rows_container.get_child_count()):
 		var revealed_row := ticket_rows_container.get_child(row_index)
 		_assert_float_close(revealed_row.modulate.a, 1.0, 0.02, "Ticket row %d finishes its reveal fully visible" % row_index)

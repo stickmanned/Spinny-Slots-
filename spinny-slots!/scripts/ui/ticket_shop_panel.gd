@@ -39,7 +39,7 @@ func configure_machines(machines: Array, selected_machine_id: StringName = &"", 
 
 
 func refresh() -> void:
-	balance_label.text = "$%d" % GameState.money
+	balance_label.text = NumberFormatter.currency(GameState.money)
 	for child in ticket_rows.get_children():
 		child.call("refresh")
 

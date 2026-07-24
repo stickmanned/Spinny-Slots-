@@ -57,9 +57,14 @@ func make_upgrade_profile(requested_levels: Dictionary, use_maximums: bool = fal
 			continue
 		var key := String(upgrade.upgrade_id)
 		var requested_level := int(requested_levels.get(key, 0))
-		var level := upgrade.max_level if use_maximums else clampi(requested_level, 0, upgrade.max_level)
+		var area_cap := (
+			upgrade.max_level_before_metropolis
+			if upgrade.max_level_before_metropolis > 0
+			else upgrade.max_level
+		)
+		var level := area_cap if use_maximums else clampi(requested_level, 0, area_cap)
 		levels[key] = level
-		maximum_levels[key] = upgrade.max_level
+		maximum_levels[key] = area_cap
 		multipliers[key] = 1.0 + upgrade.effect_per_level * level
 		display_names[key] = upgrade.display_name
 	return {

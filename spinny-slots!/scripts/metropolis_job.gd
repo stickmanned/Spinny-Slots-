@@ -14,17 +14,18 @@ const MACHINES: Array[MetropolisMachineDefinition] = [
 
 const MIN_REEL_DURATION := 0.3
 const CASCADE_TIER_REVEAL_DELAY := 0.55
+# Matches Junkyard's left-column gap so the ticket panel sits an equal
+# distance below the HUD currency panel as it does above the paytable panel.
+const LEFT_PANEL_GAP := 16.0
 # Same cell-phone gadget art and crop Junkyard uses, so the idle HUD phone
 # icon is visually identical across both areas.
 const PHONE_BASE_TEXTURE: Texture2D = preload("res://resources/gadgets/Cell Phone.png")
 const PHONE_ATLAS_REGION := Rect2(710, 480, 610, 990)
-const UPGRADE_PROVIDER := preload("res://scripts/metropolis_upgrade_provider.gd")
-
 @onready var hud: CanvasLayer = %Hud
+@onready var left_column: Control = %LeftColumn
 @onready var ticket_shop: PanelContainer = %TicketShopPanel
 @onready var paytable_panel: PanelContainer = %PaytablePanel
 @onready var selector: PanelContainer = %MachineSelectorPanel
-@onready var result_label: Label = %ResultLabel
 @onready var payout_label: Label = %PayoutLabel
 @onready var spin_button: Button = %SpinButton
 @onready var coin_collection_effect: CoinCollectionEffect = %CoinCollectionEffect
@@ -32,7 +33,6 @@ const UPGRADE_PROVIDER := preload("res://scripts/metropolis_upgrade_provider.gd"
 @onready var phone_notification: CanvasLayer = %PhoneNotification
 @onready var surge_panel: Control = %SurgePanel
 @onready var surge_value_label: Label = %SurgeValueLabel
-@onready var surge_lock_button: Button = %SurgeLockButton
 @onready var surge_reroll_button: Button = %SurgeRerollButton
 @onready var hack_panel: Control = %HackPanel
 @onready var hack_charge_label: Label = %HackChargeLabel
@@ -41,7 +41,6 @@ const UPGRADE_PROVIDER := preload("res://scripts/metropolis_upgrade_provider.gd"
 var _selected_machine: MetropolisMachineDefinition
 var _spin_in_progress := false
 var _surge_current_value := 1.0
-var _surge_locked := false
 var _surge_rerolls_used := 0
 var _hack_target_reel_index := -1
 
@@ -57,8 +56,8 @@ func _ready() -> void:
 	selector.connect("selection_changed", _on_selection_changed)
 	selector.call("set_select_button_visible", false)
 	spin_button.pressed.connect(_on_spin_pressed)
-	surge_lock_button.pressed.connect(_on_surge_lock_pressed)
 	surge_reroll_button.pressed.connect(_on_surge_reroll_pressed)
+	resized.connect(_queue_left_column_layout)
 	coin_collection_effect.balance_progressed.connect(Callable(hud, "set_presented_money"))
 	coin_collection_effect.balance_pulse_requested.connect(Callable(hud, "pulse_coin_balance"))
 	coin_collection_effect.coin_sound_requested.connect(AudioFx.play_coin_drop)
@@ -76,6 +75,26 @@ func _ready() -> void:
 	# idle icon — the "incoming call" boss trigger is intentionally not wired.
 	phone_notification.call("show_idle", _build_phone_texture())
 	_refresh_for_selected_machine()
+	_queue_left_column_layout()
+
+
+func _queue_left_column_layout() -> void:
+	call_deferred("_layout_left_column")
+
+
+func _layout_left_column() -> void:
+	# The HUD's nested containers can take an extra frame beyond the deferred
+	# call to finish settling their first layout pass, so wait one more frame
+	# before trusting the currency panel's resting position.
+	await get_tree().process_frame
+	if not is_instance_valid(left_column) or not is_instance_valid(hud):
+		return
+	var currency_panel := hud.get("currency_panel") as Control
+	if currency_panel == null:
+		return
+	# The left column starts one shared gap below the currency panel, so the
+	# three left panels (currency, ticket shop, paytable) are evenly spaced.
+	left_column.offset_top = currency_panel.get_global_rect().end.y + LEFT_PANEL_GAP
 
 
 func _build_phone_texture() -> Texture2D:
@@ -124,7 +143,6 @@ func _set_selected_machine(machine) -> void:
 	_selected_machine = machine
 	GameState.selected_machine_id = machine.machine_id
 	ticket_shop.call("select_machine", machine.machine_id)
-	result_label.text = ""
 	payout_label.text = ""
 	_refresh_for_selected_machine()
 
@@ -132,7 +150,6 @@ func _set_selected_machine(machine) -> void:
 func _refresh_for_selected_machine() -> void:
 	paytable_panel.call("configure", _selected_machine)
 	_hack_target_reel_index = -1
-	_surge_locked = false
 	_surge_rerolls_used = 0
 	_roll_surge_value()
 	_refresh_surge_panel()
@@ -140,8 +157,8 @@ func _refresh_for_selected_machine() -> void:
 	_refresh_spin_button()
 	if _selected_machine == null:
 		return
-	# Point the shared upgrade panel at this machine's own per-machine track.
-	hud.call("set_upgrade_provider", UPGRADE_PROVIDER.new(_selected_machine))
+	# One persistent upgrade track applies in both Junkyard and Metropolis.
+	hud.call("set_upgrade_provider", Economy)
 	var strip: Control = selector.call("get_active_reel_strip")
 	var icons: Array[Texture2D] = []
 	for symbol in _selected_machine.symbols:
@@ -175,13 +192,13 @@ func _refresh_surge_panel() -> void:
 	surge_value_label.text = "Surge %s" % _format_multiplier(_surge_current_value)
 	var free_rerolls := GameState.get_machine_free_rerolls(_selected_machine.machine_id)
 	var rerolls_left := _selected_machine.mechanic.surge_max_rerolls_per_spin - _surge_rerolls_used
-	surge_reroll_button.disabled = _spin_in_progress or _surge_locked or rerolls_left <= 0
+	var can_afford_reroll := free_rerolls > 0 or Economy.can_afford(_selected_machine.mechanic.surge_reroll_cost)
+	surge_reroll_button.disabled = _spin_in_progress or rerolls_left <= 0 or not can_afford_reroll
 	surge_reroll_button.text = (
 		"REROLL (FREE TOKEN)"
 		if free_rerolls > 0
-		else "REROLL ($%d)" % _selected_machine.mechanic.surge_reroll_cost
+		else "REROLL (%s)" % NumberFormatter.currency(_selected_machine.mechanic.surge_reroll_cost)
 	)
-	surge_lock_button.disabled = _spin_in_progress or _surge_locked
 
 
 ## GDScript's % formatter has no %g; format surge multipliers as x1 / x1.5 / x5
@@ -192,15 +209,9 @@ func _format_multiplier(value: float) -> String:
 	return "x%.1f" % value
 
 
-func _on_surge_lock_pressed() -> void:
-	_surge_locked = true
-	_refresh_surge_panel()
-
-
 func _on_surge_reroll_pressed() -> void:
 	var result := MetropolisEconomy.reroll_surge_multiplier_now(_selected_machine, _surge_rerolls_used)
 	if not bool(result.get("ok", false)):
-		result_label.text = String(result.get("message", ""))
 		return
 	_surge_rerolls_used += 1
 	_surge_current_value = float(result.get("value", 1.0))
@@ -259,7 +270,6 @@ func _on_spin_pressed() -> void:
 
 	_spin_in_progress = true
 	spin_started.emit(spun_machine.machine_id)
-	result_label.text = "SPINNING..."
 	payout_label.text = ""
 	_set_spin_interactions_enabled(false)
 	_refresh_spin_button()
@@ -269,7 +279,7 @@ func _on_spin_pressed() -> void:
 	for symbol in spun_machine.symbols:
 		pool_icons.append(symbol.icon)
 
-	var speed_multiplier := MetropolisEconomy.get_spin_speed_multiplier(spun_machine.machine_id)
+	var speed_multiplier := Economy.get_spin_speed_multiplier()
 	var total_duration: float = AudioFx.get_spin_duration_for_multiplier(speed_multiplier)
 	var blink_duration: float = strip.call("get_blink_duration")
 	var reel_duration := maxf(total_duration - blink_duration, MIN_REEL_DURATION)
@@ -302,7 +312,9 @@ func _on_spin_pressed() -> void:
 				await get_tree().create_timer(total_duration).timeout
 			var tier_payout := int(tier.get("payout", 0))
 			if tier_payout > 0:
-				payout_label.text = "TIER %d +$%d" % [tier_index + 1, tier_payout]
+				var multiplier: float = float(tier.get("tier_multiplier", 1.0))
+				var mult_str := " (x%d)" % int(round(multiplier)) if is_equal_approx(multiplier, roundf(multiplier)) else " (x%.2f)" % multiplier
+				payout_label.text = "COMBO %d%s +%s" % [tier_index + 1, mult_str, NumberFormatter.currency(tier_payout)]
 			var next_row: Array = (
 				tiers[tier_index + 1].get("row", [])
 				if tier_index + 1 < tiers.size()
@@ -318,13 +330,8 @@ func _on_spin_pressed() -> void:
 	if not is_inside_tree():
 		return
 
-	var names: Array[String] = []
-	for symbol in final_symbols:
-		if symbol != null:
-			names.append(symbol.display_name)
-	result_label.text = "  •  ".join(names)
 	var pending_payout := maxi(int(outcome.get("payout", 0)), 0)
-	payout_label.text = "+%d COINS" % pending_payout
+	payout_label.text = NumberFormatter.reward(pending_payout)
 	if bool(outcome.get("jackpot_landed", false)):
 		confetti_effect.play(GameState.reduced_motion)
 	await coin_collection_effect.play(
@@ -339,7 +346,6 @@ func _on_spin_pressed() -> void:
 	var awarded_payout := MetropolisEconomy.award_machine_spin(spun_machine, outcome)
 	_spin_in_progress = false
 	_hack_target_reel_index = -1
-	_surge_locked = false
 	_surge_rerolls_used = 0
 	_roll_surge_value()
 	_set_spin_interactions_enabled(true)

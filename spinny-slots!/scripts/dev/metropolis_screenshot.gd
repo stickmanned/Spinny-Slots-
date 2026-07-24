@@ -20,9 +20,12 @@ func _ready() -> void:
 
 func _run() -> void:
 	var target_index := 0
+	var scroll_tickets := false
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--machine="):
 			target_index = clampi(int(argument.trim_prefix("--machine=")), 0, MACHINES.size() - 1)
+		elif argument == "--scroll-tickets":
+			scroll_tickets = true
 	GameState.reset_for_new_game()
 	GameState.metropolis_unlocked = true
 	GameState.money = 5_000_000
@@ -41,6 +44,11 @@ func _run() -> void:
 		job.call("_on_selection_changed", MACHINES[target_index])
 	for _frame in range(10):
 		await get_tree().process_frame
+	if scroll_tickets:
+		var ticket_scroll := job.get_node("%TicketShopPanel").get_node("Content/TicketScroll") as ScrollContainer
+		ticket_scroll.scroll_vertical = 100000
+		for _frame in range(3):
+			await get_tree().process_frame
 
 	var image := get_viewport().get_texture().get_image()
 	var window_size := DisplayServer.window_get_size()

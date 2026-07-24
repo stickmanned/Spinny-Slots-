@@ -3,7 +3,7 @@ extends Node
 ## Throwaway balance simulation (not shipped). Runs N real spins per machine
 ## through MetropolisEconomy (same weights, payout tables, cascade/hack/luck
 ## resolution the game uses) and reports baseline RTP plus the RTP curve as the
-## machine's per-machine Coin Multiplier / Luck upgrades are invested, then
+## shared global Coin Multiplier / Luck upgrades are invested, then
 ## estimates grind time to the next machine's ticket once RTP passes 100%.
 ## Run headless:
 ##   godot --headless --path spinny-slots! res://scenes/dev/metropolis_balance_sim.tscn -- --spins=200000
@@ -125,9 +125,13 @@ func _report_pacing(
 		if rtp >= 1.05:
 			var net_per_spin := baseline_avg * coin_mult - float(machine.ticket_price)
 			var upgrade_cost := 0.0
-			var base := float(machine.ticket_price) * coin_config.cost_fraction_of_ticket
 			for level in range(coin_level):
-				upgrade_cost += base * pow(coin_config.cost_growth, level)
+				var base := float(coin_config.base_cost)
+				var curve_level := level
+				if level >= coin_config.max_level_before_metropolis and coin_config.metropolis_base_cost > 0:
+					base = float(coin_config.metropolis_base_cost)
+					curve_level = level - coin_config.max_level_before_metropolis
+				upgrade_cost += base * pow(coin_config.cost_growth, curve_level)
 			var spins_to_next := float(next_ticket) / net_per_spin
 			print("  pacing: Coin Lv %d reaches RTP %.0f%% (net $%s/spin); ~$%s to buy those levels;" % [
 				coin_level, rtp * 100.0, _fmt(net_per_spin), _fmt(upgrade_cost),

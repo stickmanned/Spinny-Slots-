@@ -13,7 +13,7 @@
 
 [sub_resource type="AtlasTexture" id="Atlas_cabinet"]
 atlas = ExtResource("3_cabinet")
-region = Rect2(520, 360, 960, 1320)
+region = Rect2(500, 360, 1100, 1320)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
@@ -26,6 +26,7 @@ display_name = "Joystick"
 icon = ExtResource("6_joystick_icon")
 tier = 0
 weight = 38.0
+payout = 100
 
 [sub_resource type="Resource" id="Symbol_coin"]
 script = ExtResource("4_symbol")
@@ -34,6 +35,7 @@ display_name = "Coin Slot Token"
 icon = ExtResource("7_coin_icon")
 tier = 0
 weight = 30.0
+payout = 200
 
 [sub_resource type="Resource" id="Symbol_controller"]
 script = ExtResource("4_symbol")
@@ -42,6 +44,7 @@ display_name = "Controller"
 icon = ExtResource("8_controller_icon")
 tier = 1
 weight = 18.0
+payout = 400
 
 [sub_resource type="Resource" id="Symbol_heart"]
 script = ExtResource("4_symbol")
@@ -50,6 +53,7 @@ display_name = "Pixel Heart"
 icon = ExtResource("9_heart_icon")
 tier = 2
 weight = 10.0
+payout = 800
 
 [sub_resource type="Resource" id="Symbol_star"]
 script = ExtResource("4_symbol")
@@ -58,6 +62,7 @@ display_name = "Holographic Star"
 icon = ExtResource("10_star_icon")
 tier = 3
 weight = 4.0
+payout = 2000
 
 [sub_resource type="Resource" id="Tier_common"]
 script = ExtResource("5_tier")
@@ -97,5 +102,5 @@ cabinet_texture = SubResource("Atlas_cabinet")
 reel_count = 3
 symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_joystick"), SubResource("Symbol_coin"), SubResource("Symbol_controller"), SubResource("Symbol_heart"), SubResource("Symbol_star")])
 payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
-screen_region = Rect2(180, 440, 600, 380)
+screen_region = Rect2(200, 440, 600, 380)
 mechanic = null

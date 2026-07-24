@@ -59,7 +59,7 @@ func refresh() -> void:
 	_update_name_font_size()
 	var shortfall := Economy.get_shortfall(_machine.ticket_price)
 	disabled = not _purchase_enabled or shortfall > 0
-	price_label.text = "$%d" % _machine.ticket_price
+	price_label.text = NumberFormatter.currency(_machine.ticket_price)
 
 
 func _update_name_font_size() -> void:

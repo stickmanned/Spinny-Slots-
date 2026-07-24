@@ -14,7 +14,7 @@
 
 [sub_resource type="AtlasTexture" id="Atlas_cabinet"]
 atlas = ExtResource("3_cabinet")
-region = Rect2(480, 300, 980, 1460)
+region = Rect2(460, 300, 1120, 1400)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
@@ -27,6 +27,7 @@ display_name = "Quantum Particle"
 icon = ExtResource("7_quantum_particle_icon")
 tier = 0
 weight = 32.0
+payout = 14100
 
 [sub_resource type="Resource" id="Symbol_vault_gear"]
 script = ExtResource("4_symbol")
@@ -35,6 +36,7 @@ display_name = "Vault Gear"
 icon = ExtResource("8_vault_gear_icon")
 tier = 0
 weight = 24.0
+payout = 21300
 
 [sub_resource type="Resource" id="Symbol_quark_fragment"]
 script = ExtResource("4_symbol")
@@ -43,6 +45,7 @@ display_name = "Quark Fragment"
 icon = ExtResource("9_quark_fragment_icon")
 tier = 1
 weight = 20.0
+payout = 42500
 
 [sub_resource type="Resource" id="Symbol_antimatter_core"]
 script = ExtResource("4_symbol")
@@ -51,6 +54,7 @@ display_name = "Antimatter Core"
 icon = ExtResource("10_antimatter_core_icon")
 tier = 2
 weight = 15.0
+payout = 85000
 
 [sub_resource type="Resource" id="Symbol_superposition"]
 script = ExtResource("4_symbol")
@@ -59,6 +63,7 @@ display_name = "Superposition Symbol"
 icon = ExtResource("11_superposition_symbol_icon")
 tier = 3
 weight = 9.0
+payout = 212500
 
 [sub_resource type="Resource" id="Tier_common"]
 script = ExtResource("5_tier")
@@ -111,5 +116,5 @@ cabinet_texture = SubResource("Atlas_cabinet")
 reel_count = 5
 symbols = Array[ExtResource("4_symbol")]([SubResource("Symbol_quantum_particle"), SubResource("Symbol_vault_gear"), SubResource("Symbol_quark_fragment"), SubResource("Symbol_antimatter_core"), SubResource("Symbol_superposition")])
 payout_tiers = Array[ExtResource("5_tier")]([SubResource("Tier_common"), SubResource("Tier_uncommon"), SubResource("Tier_rare"), SubResource("Tier_jackpot")])
-screen_region = Rect2(180, 340, 680, 520)
+screen_region = Rect2(200, 340, 680, 520)
 mechanic = SubResource("Mechanic_superposition")

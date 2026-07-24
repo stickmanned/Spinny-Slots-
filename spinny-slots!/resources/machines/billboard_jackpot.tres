@@ -14,11 +14,11 @@
 
 [sub_resource type="AtlasTexture" id="Atlas_cabinet"]
 atlas = ExtResource("3_cabinet")
-region = Rect2(400, 360, 1160, 1200)
+region = Rect2(400, 360, 1200, 1280)
 
 [sub_resource type="AtlasTexture" id="Atlas_ticket"]
 atlas = ExtResource("2_ticket")
-region = Rect2(320, 720, 1360, 560)
+region = Rect2(304, 710, 1388, 811)
 
 [sub_resource type="Resource" id="Symbol_bulb"]
 script = ExtResource("4_symbol")
@@ -27,6 +27,7 @@ display_name = "Bulb Trim"
 icon = ExtResource("7_bulb_icon")
 tier = 0
 weight = 34.0
+payout = 7900
 
 [sub_resource type="Resource" id="Symbol_ticket_stub"]
 script = ExtResource("4_symbol")
@@ -35,6 +36,7 @@ display_name = "Ticket Stub"
 icon = ExtResource("8_ticket_stub_icon")
 tier = 0
 weight = 26.0
+payout = 11900
 
 [sub_resource type="Resource" id="Symbol_spotlight"]
 script = ExtResource("4_symbol")
@@ -43,6 +45,7 @@ display_name = "Spotlight"
 icon = ExtResource("9_spotlight_icon")
 tier = 1
 weight = 20.0
+payout = 23800
 
 [sub_resource type="Resource" id="Symbol_golden_star"]
 script = ExtResource("4_symbol")
@@ -51,6 +54,7 @@ display_name = "Gold Star"
 icon = ExtResource("10_golden_star_icon")
 tier = 2
 weight = 13.0
+payout = 47500
 
 [sub_resource type="Resource" id="Symbol_neon_sign_burst"]
 script = ExtResource("4_symbol")
@@ -59,6 +63,7 @@ display_name = "Neon Sign Burst"
 icon = ExtResource("11_neon_sign_burst_icon")
 tier = 3
 weight = 7.0
+payout = 118800
 
 [sub_resource type="Resource" id="Tier_common"]
 script = ExtResource("5_tier")

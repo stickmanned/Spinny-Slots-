@@ -88,7 +88,8 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="LeftColumn" type="Control" parent="LeftColumnLayer/Overlay"]
+[node name="LeftColumn" type="VBoxContainer" parent="LeftColumnLayer/Overlay"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
@@ -97,24 +98,17 @@ offset_top = 174.0
 offset_right = 316.0
 offset_bottom = -24.0
 grow_vertical = 2
+theme_override_constants/separation = 16
 
 [node name="TicketShopPanel" parent="LeftColumnLayer/Overlay/LeftColumn" instance=ExtResource("4_ticket_shop")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 330.0
-grow_horizontal = 2
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="PaytablePanel" parent="LeftColumnLayer/Overlay/LeftColumn" instance=ExtResource("5_paytable")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 180)
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 342.0
-offset_bottom = 522.0
-grow_horizontal = 2
+layout_mode = 2
 
 [node name="SelectorLayer" type="CanvasLayer" parent="."]
 layer = 17
@@ -183,12 +177,6 @@ theme_override_font_sizes/font_size = 20
 text = "Surge x1"
 vertical_alignment = 1
 
-[node name="SurgeLockButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/SurgePanel"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_default_cursor_shape = 2
-text = "LOCK"
-
 [node name="SurgeRerollButton" type="Button" parent="SelectorLayer/Overlay/MachineArea/MechanicRegion/SurgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -222,29 +210,14 @@ layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8
 
-[node name="ResultLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 544.0
-offset_bottom = 564.0
-grow_horizontal = 2
-theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 22
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="PayoutLabel" type="Label" parent="SelectorLayer/Overlay/MachineArea"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 566.0
-offset_bottom = 608.0
+offset_top = 544.0
+offset_bottom = 586.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.22, 1)
 theme_override_colors/font_outline_color = Color(0.035, 0.045, 0.06, 1)
@@ -260,9 +233,9 @@ anchors_preset = 10
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -138.0
-offset_top = 614.0
+offset_top = 592.0
 offset_right = 138.0
-offset_bottom = 678.0
+offset_bottom = 656.0
 grow_horizontal = 2
 mouse_default_cursor_shape = 2
 theme_override_font_sizes/font_size = 34

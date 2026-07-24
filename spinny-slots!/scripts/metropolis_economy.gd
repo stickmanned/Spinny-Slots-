@@ -1,24 +1,14 @@
 extends Node
 
-## Metropolis's spin-resolution engine. Deliberately separate from Economy:
-## Junkyard pays the sum of each independently-rolled symbol's flat payout
-## (no matching required), while Metropolis is a real slot machine — 3-of-3
-## or count-based matches on 4- and 5-reel machines against a per-tier
-## paytable. Follows the
-## same outcome pipeline as Economy: every reel's result (and every mechanic
+## Metropolis's spin-resolution engine. Every independently rolled symbol pays
+## a flat reward; configured matches and cascades add bonuses on top. It follows
+## the same outcome pipeline as Economy: every reel's result (and every mechanic
 ## effect layered on top of it) is fully computed here before any animation
 ## plays; GameState is only mutated by prepare_machine_spin (ticket/charge
 ## costs, paid up front) and award_machine_spin (rewards, applied only after
 ## presentation finishes).
 
-## Per-machine upgrade tracks, forked from Junkyard's so their higher caps
-## (Luck 10, Spin Speed 10, Coin Multiplier 24) never touch Junkyard balance.
-const UPGRADE_CONFIGS: Array[UpgradeConfig] = [
-	preload("res://resources/upgrades/metropolis/metropolis_luck.tres"),
-	preload("res://resources/upgrades/metropolis/metropolis_spin_speed.tres"),
-	preload("res://resources/upgrades/metropolis/metropolis_coin_multiplier.tres"),
-]
-
+## Upgrade levels and prices delegate to Economy's persistent global track.
 var _rng := RandomNumberGenerator.new()
 
 
@@ -27,64 +17,37 @@ func _ready() -> void:
 
 
 func get_upgrade_configs() -> Array[UpgradeConfig]:
-	return UPGRADE_CONFIGS
+	return Economy.get_upgrade_configs()
 
 
 func get_upgrade_config(upgrade_id: StringName) -> UpgradeConfig:
-	for config in UPGRADE_CONFIGS:
-		if config.upgrade_id == upgrade_id:
-			return config
-	return null
+	return Economy.get_upgrade_config(upgrade_id)
 
 
-func get_upgrade_level(machine_id: StringName, upgrade_id: StringName) -> int:
-	var config := get_upgrade_config(upgrade_id)
-	if config == null:
-		return 0
-	return mini(GameState.get_machine_upgrade_level(machine_id, upgrade_id), config.max_level)
+func get_upgrade_level(_machine_id: StringName, upgrade_id: StringName) -> int:
+	return Economy.get_upgrade_level(upgrade_id)
 
 
-func get_upgrade_multiplier(machine_id: StringName, upgrade_id: StringName) -> float:
-	var config := get_upgrade_config(upgrade_id)
-	if config == null:
-		return 1.0
-	return 1.0 + config.effect_per_level * get_upgrade_level(machine_id, upgrade_id)
+func get_upgrade_multiplier(_machine_id: StringName, upgrade_id: StringName) -> float:
+	return Economy.get_upgrade_multiplier(upgrade_id)
 
 
-func is_upgrade_maxed(machine_id: StringName, upgrade_id: StringName) -> bool:
-	var config := get_upgrade_config(upgrade_id)
-	return config != null and get_upgrade_level(machine_id, upgrade_id) >= config.max_level
+func is_upgrade_maxed(_machine_id: StringName, upgrade_id: StringName) -> bool:
+	return Economy.is_upgrade_maxed(upgrade_id)
 
 
 ## Cost scales off the machine's own ticket price (cost_fraction_of_ticket),
 ## grown per level, so one config prices sensibly across every machine.
-func get_upgrade_cost(machine: MetropolisMachineDefinition, upgrade_id: StringName) -> int:
-	if machine == null:
-		return -1
-	var config := get_upgrade_config(upgrade_id)
-	if config == null or is_upgrade_maxed(machine.machine_id, upgrade_id):
-		return -1
-	var level := get_upgrade_level(machine.machine_id, upgrade_id)
-	var base := float(machine.ticket_price) * config.cost_fraction_of_ticket
-	if config.cost_fraction_of_ticket <= 0.0:
-		base = float(config.base_cost)
-	return maxi(roundi(base * pow(config.cost_growth, level)), 1)
+func get_upgrade_cost(_machine: MetropolisMachineDefinition, upgrade_id: StringName) -> int:
+	return Economy.get_upgrade_cost(upgrade_id)
 
 
-func purchase_upgrade(machine: MetropolisMachineDefinition, upgrade_id: StringName) -> bool:
-	if machine == null:
-		return false
-	var cost := get_upgrade_cost(machine, upgrade_id)
-	if cost < 0 or not Economy.can_afford(cost):
-		return false
-	if not GameState.spend_money(cost):
-		return false
-	GameState.increment_machine_upgrade_level(machine.machine_id, upgrade_id)
-	return true
+func purchase_upgrade(_machine: MetropolisMachineDefinition, upgrade_id: StringName) -> bool:
+	return Economy.purchase_upgrade(upgrade_id)
 
 
-func get_spin_speed_multiplier(machine_id: StringName) -> float:
-	return get_upgrade_multiplier(machine_id, &"spin_speed")
+func get_spin_speed_multiplier(_machine_id: StringName) -> float:
+	return Economy.get_spin_speed_multiplier()
 
 
 func set_rng_seed(value: int) -> void:
@@ -222,6 +185,14 @@ func total_payout(matches: Array[Dictionary]) -> int:
 	return total
 
 
+func total_symbol_payout(symbols: Array[MetropolisSymbol]) -> int:
+	var total := 0
+	for symbol in symbols:
+		if symbol != null:
+			total += maxi(symbol.payout, 0)
+	return total
+
+
 ## Convenience wrappers over MetropolisEconomy's own RNG, for UI callers that
 ## don't own a RandomNumberGenerator (mirrors Economy.roll_symbol vs
 ## roll_symbol_with_rng).
@@ -270,11 +241,9 @@ func prepare_machine_spin(machine: MetropolisMachineDefinition, options: Diction
 	if not GameState.consume_machine_ticket(machine.machine_id):
 		return {}
 	var effective_options := options.duplicate()
-	# Fold this machine's own Luck and Coin Multiplier upgrade levels into the
-	# spin. Both default to 1.0 at level 0, so an un-upgraded machine plays at
-	# the baseline RTP the paytables are tuned to.
-	effective_options["luck_multiplier"] = get_upgrade_multiplier(machine.machine_id, &"luck")
-	effective_options["coin_multiplier"] = get_upgrade_multiplier(machine.machine_id, &"coin_multiplier")
+	# The same persistent upgrade levels apply to every machine in every area.
+	effective_options["luck_multiplier"] = Economy.get_upgrade_multiplier(&"luck")
+	effective_options["coin_multiplier"] = Economy.get_upgrade_multiplier(&"coin_multiplier")
 	var hack_reel_index := int(effective_options.get("spend_hack_charge_on_reel_index", -1))
 	if (
 		hack_reel_index >= 0
@@ -316,10 +285,12 @@ func calculate_machine_spin(
 
 	var tiers: Array[Dictionary] = []
 	var final_symbols: Array[MetropolisSymbol] = []
+	var cascade_jackpot_seen := false
 	if machine.get_mechanic_kind() == MetropolisMechanicConfig.Kind.CASCADE_MATCH:
 		var cascade := _resolve_cascade(machine, rng, luck_multiplier)
 		tiers = cascade["tiers"]
 		final_symbols = cascade["final_row"]
+		cascade_jackpot_seen = bool(cascade["jackpot_seen"])
 	else:
 		final_symbols = roll_reels(machine, rng, per_reel_multiplier)
 		var matches := evaluate_matches(machine, final_symbols)
@@ -330,15 +301,20 @@ func calculate_machine_spin(
 			"payout": total_payout(matches),
 		}]
 
-	var gross_payout := 0
-	var jackpot_landed := false
+	var initial_symbols: Array[MetropolisSymbol] = final_symbols
+	if not tiers.is_empty():
+		initial_symbols = tiers[0].get("row", final_symbols)
+	var symbol_payout := total_symbol_payout(initial_symbols)
+	var match_bonus := 0
+	var jackpot_landed := cascade_jackpot_seen
 	for tier in tiers:
-		gross_payout += int(tier.get("payout", 0))
+		match_bonus += int(tier.get("payout", 0))
 		var row: Array = tier.get("row", [])
 		for symbol in row:
 			if symbol != null and symbol.tier == MetropolisSymbol.Tier.JACKPOT:
 				jackpot_landed = true
 
+	var gross_payout := symbol_payout + match_bonus
 	var surge_multiplier := maxf(float(options.get("surge_multiplier", 1.0)), 0.0)
 	var coin_multiplier := maxf(float(options.get("coin_multiplier", 1.0)), 0.0)
 	var final_payout := maxi(floori(float(gross_payout) * surge_multiplier * coin_multiplier), 0)
@@ -348,6 +324,9 @@ func calculate_machine_spin(
 		"machine_id": machine.machine_id,
 		"symbols": final_symbols,
 		"tiers": tiers,
+		"base_total": symbol_payout,
+		"symbol_payout": symbol_payout,
+		"match_bonus": match_bonus,
 		"gross_payout": gross_payout,
 		"surge_multiplier": surge_multiplier,
 		"coin_multiplier": coin_multiplier,
@@ -416,7 +395,7 @@ func _resolve_cascade(
 			current_row = _refill_row(machine, rng, current_row, matches, luck_multiplier)
 			break
 		current_row = _refill_row(machine, rng, current_row, matches, luck_multiplier)
-	return {"tiers": tiers, "final_row": current_row}
+	return {"tiers": tiers, "final_row": current_row, "jackpot_seen": jackpot_seen}
 
 
 func _refill_row(

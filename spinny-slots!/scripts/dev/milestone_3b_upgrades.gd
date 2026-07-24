@@ -136,7 +136,7 @@ func _verify_spin_speed_audio_sync() -> void:
 	_assert_true(stream_length > 2.5, "Slot-machine audio stream loaded with a real duration")
 	var previous_duration := INF
 	var speed_config := Economy.get_upgrade_config(&"spin_speed")
-	for level in range(speed_config.max_level + 1):
+	for level in range(Economy.get_upgrade_max_level(&"spin_speed") + 1):
 		GameState.upgrade_levels["spin_speed"] = level
 		var speed := Economy.get_spin_speed_multiplier()
 		_assert_float_close(speed, 1.0 + speed_config.effect_per_level * level, 0.001, "Spin-speed multiplier matches its configured per-level effect at level %d" % level)
@@ -261,7 +261,7 @@ func _verify_spin_interaction_safety() -> void:
 	_assert_true(presented_balances.size() >= 2, "Balance presentation advances across multiple coin arrivals")
 	if not presented_balances.is_empty():
 		_assert_equal(presented_balances[-1], GameState.money, "The final presented balance exactly matches authoritative money")
-	_assert_equal(coin_value.text, str(GameState.money), "HUD balance settles on the authoritative awarded amount")
+	_assert_equal(coin_value.text, NumberFormatter.compact(GameState.money), "HUD balance settles on the authoritative awarded amount")
 	await _frames(2)
 	_assert_equal(coin_effect.get_child_count(), 0, "All temporary coin Controls are cleaned up")
 	_assert_equal(CoinCollectionEffect.get_visual_coin_count(1000000), CoinCollectionEffect.MAX_VISUAL_COINS, "Large rewards remain capped at the visual coin limit")

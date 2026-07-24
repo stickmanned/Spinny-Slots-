@@ -1,9 +1,9 @@
 class_name MetropolisMachineDefinition
 extends Resource
 
-## Metropolis counterpart to MachineDefinition. Reel count varies per
-## machine (3, 4, or 5) and payout is resolved by MetropolisEconomy from
-## payout_tiers, not from a flat per-symbol value.
+## Metropolis counterpart to MachineDefinition. Reel count varies per machine
+## (3, 4, or 5). Each symbol pays independently; payout_tiers add match and
+## cascade bonuses without making a matching row mandatory for a reward.
 
 @export var machine_id: StringName
 @export var display_name: String

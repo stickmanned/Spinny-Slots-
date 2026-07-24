@@ -100,7 +100,7 @@ func _verify_odds_panel_and_cycling() -> void:
 			var expected_percent := "%d%%" % roundi(Economy.get_symbol_probability(machine, symbol) * 100.0)
 			_assert_equal(percent_label.text, expected_percent, "%s odds row for %s shows the configured probability" % [machine.display_name, symbol.display_name])
 			var value_label: Label = row.get_node("%ValueLabel")
-			_assert_equal(value_label.text, "$%d" % symbol.payout, "%s odds row for %s shows the symbol's coin value" % [machine.display_name, symbol.display_name])
+			_assert_equal(value_label.text, NumberFormatter.currency(symbol.payout), "%s odds row for %s shows the symbol's coin value" % [machine.display_name, symbol.display_name])
 		right_arrow.emit_signal("pressed")
 		await _frames(2)
 

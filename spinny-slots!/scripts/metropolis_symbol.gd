@@ -1,9 +1,8 @@
 class_name MetropolisSymbol
 extends Resource
 
-## Metropolis payouts are looked up by (tier, match count) on the owning
-## machine's payout_tiers, not by a flat per-symbol value like Junkyard's
-## SlotSymbol. Tier is the only economic property a symbol carries.
+## Every landed symbol pays this flat amount, just like Junkyard. The owning
+## machine's payout tiers remain optional match/cascade bonuses layered on top.
 enum Tier {
 	COMMON,
 	UNCOMMON,
@@ -16,6 +15,7 @@ enum Tier {
 @export var icon: Texture2D
 @export var tier: Tier = Tier.COMMON
 @export_range(0.0, 100.0, 0.01) var weight: float = 1.0
+@export_range(0, 2147483647, 1) var payout: int = 0
 
 
 static func tier_name(value: Tier) -> String:

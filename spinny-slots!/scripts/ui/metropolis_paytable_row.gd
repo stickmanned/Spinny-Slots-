@@ -25,31 +25,18 @@ func configure(symbol: MetropolisSymbol, payout_tier: MetropolisPayoutTier, prob
 		"font_color", TIER_COLORS.get(symbol.tier, Color.WHITE)
 	)
 	percent_label.text = "%d%%" % roundi(probability * 100.0)
-	value_label.text = _format_payouts(payout_tier)
+	value_label.text = "%s EACH" % NumberFormatter.currency(symbol.payout)
+	var match_text := _format_payouts(payout_tier)
+	if not match_text.is_empty():
+		value_label.text += "   BONUS " + match_text
 
 
 func _format_payouts(payout_tier: MetropolisPayoutTier) -> String:
 	if payout_tier == null:
-		return "3x $0"
+		return ""
 	var counts := payout_tier.payouts_by_count.keys()
 	counts.sort()
 	var parts: Array[String] = []
 	for count in counts:
-		parts.append("%sx $%s" % [count, _format_amount(int(payout_tier.payouts_by_count[count]))])
-	return "   ".join(parts) if not parts.is_empty() else "3x $0"
-
-
-## Compact money formatting so long payout curves fit one line: 1500 -> 1.5K,
-## 2000000 -> 2M. Keeps the paytable readable without truncation.
-func _format_amount(amount: int) -> String:
-	if amount >= 1_000_000:
-		return "%sM" % _trim(float(amount) / 1_000_000.0)
-	if amount >= 1_000:
-		return "%sK" % _trim(float(amount) / 1_000.0)
-	return str(amount)
-
-
-func _trim(value: float) -> String:
-	if is_equal_approx(value, roundf(value)):
-		return str(int(round(value)))
-	return "%.1f" % value
+		parts.append("%sx %s" % [count, NumberFormatter.currency(int(payout_tier.payouts_by_count[count]))])
+	return "   ".join(parts)

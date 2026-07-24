@@ -229,7 +229,16 @@ func get_upgrade_level(upgrade_id: StringName) -> int:
 	var config := get_upgrade_config(upgrade_id)
 	if config == null:
 		return 0
-	return mini(GameState.get_upgrade_level(upgrade_id), config.max_level)
+	return mini(GameState.get_upgrade_level(upgrade_id), get_upgrade_max_level(upgrade_id))
+
+
+func get_upgrade_max_level(upgrade_id: StringName) -> int:
+	var config := get_upgrade_config(upgrade_id)
+	if config == null:
+		return 0
+	if GameState.metropolis_unlocked or config.max_level_before_metropolis <= 0:
+		return config.max_level
+	return mini(config.max_level_before_metropolis, config.max_level)
 
 
 func get_upgrade_multiplier(upgrade_id: StringName) -> float:
@@ -241,14 +250,23 @@ func get_upgrade_multiplier(upgrade_id: StringName) -> float:
 
 func is_upgrade_maxed(upgrade_id: StringName) -> bool:
 	var config := get_upgrade_config(upgrade_id)
-	return config != null and get_upgrade_level(upgrade_id) >= config.max_level
+	return config != null and get_upgrade_level(upgrade_id) >= get_upgrade_max_level(upgrade_id)
 
 
 func get_upgrade_cost(upgrade_id: StringName) -> int:
 	var config := get_upgrade_config(upgrade_id)
 	if config == null or is_upgrade_maxed(upgrade_id):
 		return -1
-	return roundi(config.base_cost * pow(config.cost_growth, get_upgrade_level(upgrade_id)))
+	var level := get_upgrade_level(upgrade_id)
+	if (
+		GameState.metropolis_unlocked
+		and config.max_level_before_metropolis > 0
+		and config.metropolis_base_cost > 0
+		and level >= config.max_level_before_metropolis
+	):
+		var metropolis_level := level - config.max_level_before_metropolis
+		return roundi(config.metropolis_base_cost * pow(config.cost_growth, metropolis_level))
+	return roundi(config.base_cost * pow(config.cost_growth, level))
 
 
 func purchase_upgrade(upgrade_id: StringName) -> bool:
